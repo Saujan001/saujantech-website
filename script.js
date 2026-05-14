@@ -186,7 +186,7 @@ const supabaseClient = window.supabase.createClient(
   if (!form) return;
 
   var emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  var phoneRx = /^(\+61|0)[0-9\s\-]{8,13}$/;
+  var phoneRx = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,4}[-\s\.]?[0-9]{1,9}$/;
 
   /* ── Helpers ── */
   function showError(id, show) {
@@ -232,7 +232,8 @@ const supabaseClient = window.supabase.createClient(
   function validatePhone(el) {
     var v = el.value.trim();
     if (!v) { clearField(el, 'error-phone'); return true; }
-    var ok = phoneRx.test(v);
+    var digitsOnly = v.replace(/\D/g, '');
+    var ok = phoneRx.test(v) && digitsOnly.length >= 7 && digitsOnly.length <= 15;
     markField(el, ok);
     showError('error-phone', !ok);
     return ok;
