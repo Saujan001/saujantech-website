@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SaujanTech — Smart Websites. Intelligent Automation. Real Results.</title>
+  <meta name="description" content="SaujanTech is an AI Automation and Web Design agency based in Sydney, Australia. We help businesses with websites, voice agents, chatbots and automation." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="root">
+
+  <!-- ============================================================
+       NAV
+       ============================================================ -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">
+        <span class="nav-bracket">&lt;/&gt;</span>
+        <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+      </a>
+
+      <div class="nav-links" id="nav-links">
+        <a href="#home"      class="nav-link">Home</a>
+        <a href="#about"     class="nav-link">About</a>
+        <a href="#services"  class="nav-link">Services</a>
+        <a href="#portfolio" class="nav-link">Portfolio</a>
+        <a href="#pricing"   class="nav-link">Pricing</a>
+        <a href="#contact"   class="nav-link">Contact</a>
+        <a href="#contact"   class="btn btn-glow btn-sm" style="margin-left:6px">Get Free Consultation →</a>
+      </div>
+
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section id="home" class="dot-grid hero-wrap">
+    <div class="hero-overlay"></div>
+    <div class="container">
+      <div class="hero-grid">
+
+        <!-- Left -->
+        <div>
+          <span class="hero-badge">
+            <span style="color:#22D3EE">⚡</span>
+            AI-Powered Digital Agency — Sydney
+          </span>
+          <h1 class="hero-h1">
+            Building the Future of<br>
+            Business with <span class="grad-text">AI</span>
+          </h1>
+          <p class="hero-sub">
+            I help Sydney businesses launch beautiful websites and intelligent automations —
+            voice agents, chatbots, booking systems and review flows — so you can stop chasing
+            admin and start growing.
+          </p>
+          <div class="hero-ctas">
+            <a href="#portfolio" class="btn btn-grad">See My Work →</a>
+            <a href="#contact"   class="btn btn-ghost">📞 Book Free Call</a>
+          </div>
+          <div class="trust-row">
+            <span class="trust-badge">✅ Websites from $99/month</span>
+            <span class="trust-badge">✅ AI Setup in 48 Hours</span>
+            <span class="trust-badge">✅ Nepali &amp; English Support</span>
+          </div>
+        </div>
+
+        <!-- Right — Floating Dashboard -->
+        <div class="dashboard-wrap">
+          <div class="dashboard-glow"></div>
+          <div class="dashboard-card">
+
+            <!-- Window chrome -->
+            <div class="dashboard-chrome">
+              <div class="traffic-lights">
+                <span class="tl tl-red"></span>
+                <span class="tl tl-yellow"></span>
+                <span class="tl tl-green"></span>
+              </div>
+              <span class="dash-title">AUTOMATIONS.LIVE</span>
+              <span class="live-badge">
+                <span class="live-dot"></span>LIVE
+              </span>
+            </div>
+
+            <!-- KPI row -->
+            <div class="dashboard-stats">
+              <div class="dash-stat">
+                <div class="dash-stat-key">Bookings</div>
+                <div class="dash-stat-val">24 <span class="dash-stat-delta">+12%</span></div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-key">Replies</div>
+                <div class="dash-stat-val">187 <span class="dash-stat-delta">+8%</span></div>
+              </div>
+              <div class="dash-stat">
+                <div class="dash-stat-key">Reviews</div>
+                <div class="dash-stat-val">41 <span class="dash-stat-delta">+22%</span></div>
+              </div>
+            </div>
+
+            <!-- Sparkline -->
+            <div class="sparkline">
+              <svg viewBox="0 0 300 40" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%"   stop-color="#22D3EE" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#22D3EE" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,30 L20,26 L40,28 L60,22 L80,24 L100,18 L120,20 L140,14 L160,16 L180,10 L200,13 L220,8 L240,11 L260,6 L280,9 L300,4 L300,40 L0,40 Z" fill="url(#sparkFill)"/>
+                <path d="M0,30 L20,26 L40,28 L60,22 L80,24 L100,18 L120,20 L140,14 L160,16 L180,10 L200,13 L220,8 L240,11 L260,6 L280,9 L300,4" stroke="#22D3EE" stroke-width="1.6" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- Activity feed -->
+            <div class="feed-header">
+              <span class="feed-header-label">Activity feed</span>
+              <span class="feed-header-time">just now</span>
+            </div>
+            <div class="activity-feed" id="activity-feed"></div>
+          </div>
+
+          <div class="ai-pill">✨ AI is working</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       STATS STRIP
+       ============================================================ -->
+  <section class="stats-wrap">
+    <div class="stats-glow"></div>
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num" data-target="10" data-suffix="+">0+</div>
+          <div class="stat-label">Websites Built</div>
+          <span class="stat-divider"></span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="3" data-suffix="+">0+</div>
+          <div class="stat-label">AI Automations Running</div>
+          <span class="stat-divider"></span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="100" data-suffix="%">0%</div>
+          <div class="stat-label">Client Satisfaction</div>
+          <span class="stat-divider"></span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" data-target="48" data-suffix="hrs">0hrs</div>
+          <div class="stat-label">Average Delivery</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ABOUT
+       ============================================================ -->
+  <section id="about" class="about-wrap">
+    <div class="container">
+      <div class="about-grid">
+
+        <!-- Photo -->
+        <div>
+          <div class="about-photo-wrap">
+            <div class="about-photo-frame">
+              <img
+                src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=900&q=80&auto=format&fit=crop"
+                alt="Saujan — Founder of SaujanTech"
+              />
+              <div class="about-photo-tint"></div>
+            </div>
+            <span class="about-loc">📍 Sydney, Australia</span>
+            <span class="about-flag">🇳🇵 Nepali Heritage</span>
+          </div>
+        </div>
+
+        <!-- Copy -->
+        <div>
+          <div class="section-tag">About me</div>
+          <h2 class="section-title" style="color:#0B1020">
+            The Tech Guy Who<br>
+            <span class="grad-blue-cyan">Speaks Your Language.</span>
+          </h2>
+          <p class="about-copy">
+            Hi, I'm Saujan — a Nepali developer based in Sydney. I started SaujanTech to give
+            local businesses, especially our Nepali community, the same AI superpowers the big
+            brands use — without the enterprise price tag or the jargon. Whether it's a
+            brand-new website, a 24/7 voice agent answering calls in Nepali and English, or a
+            chatbot that books appointments while you sleep, I build it end-to-end and
+            support you in plain language.
+          </p>
+
+          <div class="about-skills">
+            <span class="about-skill">🌐 Web Design</span>
+            <span class="about-skill">🤖 AI Automation</span>
+            <span class="about-skill">🎙️ Voice Agents</span>
+            <span class="about-skill">💬 Chatbots</span>
+            <span class="about-skill">📅 Booking Systems</span>
+            <span class="about-skill">⭐ Review Funnels</span>
+          </div>
+
+          <div class="about-signature">
+            <div class="about-sig-avatar">S</div>
+            <div>
+              <div class="about-sig-name">Saujan</div>
+              <div class="about-sig-title">Founder · SaujanTech</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SERVICES
+       ============================================================ -->
+  <section id="services" class="services-wrap">
+    <div class="container">
+      <div class="services-head">
+        <div class="section-tag">What I do</div>
+        <h2 class="section-title" style="color:#0B1020">
+          Eight services. One <span class="grad-blue-cyan">growth engine.</span>
+        </h2>
+        <p class="section-sub" style="margin:18px auto 0;color:#6B7390">
+          From the first click on your website to the AI agent answering your phone at 2am —
+          every piece works together so your business runs while you sleep.
+        </p>
+      </div>
+
+      <div class="services-grid">
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">🌐</div>
+          <span class="service-num mono">01</span>
+          <h3>Website Design</h3>
+          <p>Fast, modern, mobile-first websites built to convert visitors into customers.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">💬</div>
+          <span class="service-num mono">02</span>
+          <h3>AI Chatbot</h3>
+          <p>A friendly assistant on your site answering FAQs, capturing leads 24/7.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">🎙️</div>
+          <span class="service-num mono">03</span>
+          <h3>AI Voice Agent</h3>
+          <p>Never miss a call again — an AI receptionist that books, quotes and routes.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">📱</div>
+          <span class="service-num mono">04</span>
+          <h3>AI Messaging Automation</h3>
+          <p>SMS, WhatsApp and Instagram DMs handled automatically with smart replies.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">📅</div>
+          <span class="service-num mono">05</span>
+          <h3>Smart Booking System</h3>
+          <p>Online calendar, deposits and reminders that cut no-shows in half.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">⭐</div>
+          <span class="service-num mono">06</span>
+          <h3>Google Review System</h3>
+          <p>Auto-request 5★ reviews after every job. Watch your reputation grow.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">📧</div>
+          <span class="service-num mono">07</span>
+          <h3>Email &amp; SMS Campaigns</h3>
+          <p>Re-engage past customers with seasonal offers that actually get read.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-glow"></div>
+          <div class="service-icon">🖥️</div>
+          <span class="service-num mono">08</span>
+          <h3>Hosting &amp; Management</h3>
+          <p>Fast hosting, security and ongoing tweaks — you focus on running the shop.</p>
+          <div class="service-learn">Learn more <span>→</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       HOW IT WORKS
+       ============================================================ -->
+  <section class="steps-wrap dot-grid">
+    <div class="container" style="position:relative">
+      <div class="steps-head">
+        <div class="section-tag">How it works</div>
+        <h2 class="section-title">From first call to live in 48 hours.</h2>
+        <p class="section-sub" style="margin:18px auto 0">
+          No agency fluff, no endless meetings. Four simple steps and you're online.
+        </p>
+      </div>
+
+      <div class="steps-grid">
+        <!-- Dashed connector line -->
+        <svg class="steps-connector" viewBox="0 0 1000 2" preserveAspectRatio="none">
+          <line x1="0" y1="1" x2="1000" y2="1"
+                stroke="rgba(6,182,212,0.55)" stroke-width="2"
+                stroke-dasharray="6 8"/>
+        </svg>
+
+        <div class="step-item">
+          <div class="step-icon-wrap">📞</div>
+          <div class="step-num mono">STEP 01</div>
+          <h3>Free Consultation</h3>
+          <p>A 30-min call to map your business, your bottlenecks and your goals.</p>
+        </div>
+
+        <div class="step-item">
+          <div class="step-icon-wrap">⚙️</div>
+          <div class="step-num mono">STEP 02</div>
+          <h3>I Build Your System</h3>
+          <p>Website, automations, integrations — designed and built end-to-end.</p>
+        </div>
+
+        <div class="step-item">
+          <div class="step-icon-wrap">✅</div>
+          <div class="step-num mono">STEP 03</div>
+          <h3>You Review &amp; Approve</h3>
+          <p>You see every page and flow in a private preview before anything goes live.</p>
+        </div>
+
+        <div class="step-item">
+          <div class="step-icon-wrap">🚀</div>
+          <div class="step-num mono">STEP 04</div>
+          <h3>Go Live &amp; Grow</h3>
+          <p>I launch, monitor and keep optimising. Ongoing support included.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PORTFOLIO
+       ============================================================ -->
+  <section id="portfolio" class="portfolio-wrap">
+    <div class="container">
+      <div class="portfolio-head">
+        <div class="section-tag">Selected work</div>
+        <h2 class="section-title" style="color:#0B1020">
+          Real projects. <span class="grad-blue-cyan">Real results.</span>
+        </h2>
+        <p class="section-sub" style="margin:18px auto 0;color:#6B7390">
+          A small but growing list — each one shipped end-to-end, on time and on a real budget.
+        </p>
+      </div>
+
+      <div class="portfolio-grid">
+
+        <!-- Project 1 -->
+        <article class="project-card">
+          <div class="project-img" style="background:linear-gradient(135deg,#F59E0B 0%,#DC2626 60%,#7C2D12 100%)">
+            <div class="project-img-dots"></div>
+            <div class="project-img-glyph">🍛</div>
+            <div class="project-img-tag">Restaurant Website</div>
+          </div>
+          <div class="project-body">
+            <h3>Himalayan Kitchen</h3>
+            <p>A bookings-ready website with menu, online table reservations and a chatbot that answers in English and Nepali.</p>
+            <div class="project-stack">
+              <span class="stack-pill">Next.js</span>
+              <span class="stack-pill">Tailwind</span>
+              <span class="stack-pill">AI Chatbot</span>
+              <span class="stack-pill">Square</span>
+            </div>
+            <div class="project-link">View case study →</div>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="project-card">
+          <div class="project-img" style="background:linear-gradient(135deg,#0EA5E9 0%,#2563EB 60%,#1E1B4B 100%)">
+            <div class="project-img-dots"></div>
+            <div class="project-img-glyph">🗞️</div>
+            <div class="project-img-tag">Community News Site</div>
+          </div>
+          <div class="project-body">
+            <h3>NepalinAus.com</h3>
+            <p>A news and community platform for Nepalis in Australia — with editor dashboard, weekly newsletter and event listings.</p>
+            <div class="project-stack">
+              <span class="stack-pill">Sanity CMS</span>
+              <span class="stack-pill">React</span>
+              <span class="stack-pill">Mailchimp</span>
+            </div>
+            <div class="project-link">View case study →</div>
+          </div>
+        </article>
+
+        <!-- Project 3 — placeholder -->
+        <article class="project-card">
+          <div class="project-placeholder">
+            <div class="project-placeholder-plus">＋</div>
+            [ your project goes here ]
+          </div>
+          <div class="project-body">
+            <div class="project-tag-pill">Your Spot Open</div>
+            <h3>Your Business Here</h3>
+            <p>Could be your restaurant, salon, trade business or clinic. Let's build the site that finally works for you.</p>
+            <div class="project-stack">
+              <span class="stack-pill">Custom Build</span>
+              <span class="stack-pill">AI Automation</span>
+            </div>
+            <div class="project-link">Start your project →</div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PRICING
+       ============================================================ -->
+  <section id="pricing" class="pricing-wrap">
+    <div class="container">
+      <div class="pricing-head">
+        <div class="section-tag">Pricing</div>
+        <h2 class="section-title" style="color:#0B1020">
+          Simple, monthly. <span class="grad-blue-cyan">No surprises.</span>
+        </h2>
+        <p class="section-sub" style="margin:18px auto 0;color:#6B7390">
+          Pay monthly, cancel anytime. All plans include hosting, security and a real human on the other end.
+        </p>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- Starter -->
+        <div class="plan-card regular">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price-row">
+            <span class="plan-price">$99</span>
+            <span class="plan-period">/ month</span>
+          </div>
+          <p class="plan-blurb">For small businesses ready to look pro online.</p>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li class="plan-feature included"><span class="feature-check">✓</span> 5-page modern website</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Mobile + SEO optimised</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Contact form + WhatsApp button</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Hosting &amp; SSL included</li>
+            <li class="plan-feature excluded"><span class="feature-check">✕</span> AI chatbot</li>
+            <li class="plan-feature excluded"><span class="feature-check">✕</span> Voice agent</li>
+            <li class="plan-feature excluded"><span class="feature-check">✕</span> Review automation</li>
+          </ul>
+          <div class="plan-cta">
+            <a href="#contact" class="btn btn-dark" style="width:100%;justify-content:center">Start with Starter →</a>
+          </div>
+        </div>
+
+        <!-- Growth — highlight -->
+        <div class="plan-card highlight">
+          <div class="plan-best-badge">★ BEST VALUE</div>
+          <div class="plan-name">Growth</div>
+          <div class="plan-price-row">
+            <span class="plan-price">$199</span>
+            <span class="plan-period">/ month</span>
+          </div>
+          <p class="plan-blurb">Most businesses pick this — website plus your first automation.</p>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li class="plan-feature included"><span class="feature-check">✓</span> Everything in Starter</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> AI chatbot trained on your business</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Smart booking system</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Google review automation</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Monthly content updates</li>
+            <li class="plan-feature excluded"><span class="feature-check">✕</span> Voice agent</li>
+            <li class="plan-feature excluded"><span class="feature-check">✕</span> SMS &amp; email campaigns</li>
+          </ul>
+          <div class="plan-cta">
+            <a href="#contact" class="btn btn-grad" style="width:100%;justify-content:center">Get Growth plan →</a>
+          </div>
+        </div>
+
+        <!-- Premium -->
+        <div class="plan-card regular">
+          <div class="plan-name">Premium</div>
+          <div class="plan-price-row">
+            <span class="plan-price">$299</span>
+            <span class="plan-period">/ month</span>
+          </div>
+          <p class="plan-blurb">Full suite — website, voice, chat, campaigns, everything.</p>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li class="plan-feature included"><span class="feature-check">✓</span> Everything in Growth</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> 24/7 AI voice agent (Eng + Nepali)</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> WhatsApp &amp; Instagram automation</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> SMS &amp; email campaigns</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Priority support (same-day)</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Quarterly strategy review</li>
+            <li class="plan-feature included"><span class="feature-check">✓</span> Custom integrations</li>
+          </ul>
+          <div class="plan-cta">
+            <a href="#contact" class="btn btn-dark" style="width:100%;justify-content:center">Go Premium →</a>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="pricing-note">
+        🛡️ 14-day money-back guarantee · 🇦🇺 GST inclusive · Custom enterprise quotes available
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TESTIMONIALS
+       ============================================================ -->
+  <section class="testimonials-wrap dot-grid">
+    <div class="container" style="position:relative">
+      <div class="testimonials-head">
+        <div class="section-tag">What clients say</div>
+        <h2 class="section-title">
+          Sydney businesses,<br>
+          <span class="grad-text">real outcomes.</span>
+        </h2>
+      </div>
+
+      <div class="testimonials-grid">
+
+        <article class="testimonial-card">
+          <div class="testimonial-quote-mark" aria-hidden="true">"</div>
+          <div class="testimonial-stars">★★★★★</div>
+          <p>"Saujan rebuilt our website and added a booking chatbot — within two weeks we were getting more reservations than ever, and our staff stopped picking up the phone all night."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:linear-gradient(135deg,#F59E0B,#DC2626)">RS</div>
+            <div>
+              <div class="testimonial-name">Raj Sharma</div>
+              <div class="testimonial-role">Owner · Himalayan Kitchen</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card">
+          <div class="testimonial-quote-mark" aria-hidden="true">"</div>
+          <div class="testimonial-stars">★★★★★</div>
+          <p>"The AI voice agent answers every call when I'm on a job. It books quotes in Nepali and English. Honestly, it pays for itself in one job a week."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:linear-gradient(135deg,#2563EB,#06B6D4)">BT</div>
+            <div>
+              <div class="testimonial-name">Binod Thapa</div>
+              <div class="testimonial-role">Founder · BT Plumbing</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card">
+          <div class="testimonial-quote-mark" aria-hidden="true">"</div>
+          <div class="testimonial-stars">★★★★★</div>
+          <p>"Reviews tripled in a month thanks to the auto-review system. My new website looks better than the big salons in the city. Saujan explained everything in plain Nepali."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background:linear-gradient(135deg,#A855F7,#EC4899)">SG</div>
+            <div>
+              <div class="testimonial-name">Sunita Gurung</div>
+              <div class="testimonial-role">Owner · Glow Hair Studio</div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CONTACT
+       ============================================================ -->
+  <section id="contact" class="contact-wrap">
+    <div class="container">
+      <div class="contact-grid">
+
+        <!-- Left — info -->
+        <div>
+          <div class="section-tag">Get in touch</div>
+          <h2 class="section-title" style="color:#0B1020">
+            Let's build<br>
+            <span class="grad-blue-cyan">something smart.</span>
+          </h2>
+          <p style="color:#6B7390;font-size:17px;line-height:1.65;margin-top:18px;max-width:460px">
+            Free 15-minute consultation. I'll review your business, tell you exactly what I'd build,
+            and quote you on the spot. No pressure, no jargon.
+          </p>
+
+          <div class="contact-details-box">
+            <div class="contact-detail">
+              <div class="contact-ico">📧</div>
+              <div>
+                <div class="contact-detail-label">Email</div>
+                <div class="contact-detail-value">hello@saujantech.com.au</div>
+              </div>
+            </div>
+            <div class="contact-divider"></div>
+            <div class="contact-detail">
+              <div class="contact-ico">📱</div>
+              <div>
+                <div class="contact-detail-label">Phone / WhatsApp</div>
+                <div class="contact-detail-value">+61 413 736 241</div>
+              </div>
+            </div>
+            <div class="contact-divider"></div>
+            <div class="contact-detail">
+              <div class="contact-ico">📍</div>
+              <div>
+                <div class="contact-detail-label">Based in</div>
+                <div class="contact-detail-value">Sydney, NSW · Servicing all of Australia</div>
+              </div>
+            </div>
+          </div>
+
+          <a href="https://wa.me/61413736241" class="whatsapp-btn" target="_blank" rel="noopener noreferrer">
+            <span style="font-size:18px">💬</span> Message on WhatsApp
+          </a>
+        </div>
+
+        <!-- Right — form -->
+        <div>
+          <form class="contact-form-card" id="contact-form" novalidate>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label" for="f-name">Your name</label>
+                <input id="f-name" type="text" required placeholder="e.g. Raj Sharma" class="field-input" name="name" />
+              </div>
+              <div class="form-field">
+                <label class="field-label" for="f-email">Email</label>
+                <input id="f-email" type="email" required placeholder="you@business.com.au" class="field-input" name="email" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label" for="f-phone">Phone (optional)</label>
+                <input id="f-phone" type="tel" placeholder="+61 4xx xxx xxx" class="field-input" name="phone" />
+              </div>
+              <div class="form-field">
+                <label class="field-label" for="f-biz">Business type</label>
+                <select id="f-biz" required class="field-input" name="biz">
+                  <option value="">Select one…</option>
+                  <option>Restaurant / Café</option>
+                  <option>Trades (plumbing, electrical, etc.)</option>
+                  <option>Salon / Wellness</option>
+                  <option>Retail / E-commerce</option>
+                  <option>Professional Services</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label" for="f-service">What are you interested in?</label>
+              <select id="f-service" required class="field-input" name="service">
+                <option value="">Pick a service…</option>
+                <option>Brand new website</option>
+                <option>AI chatbot for my site</option>
+                <option>AI voice agent for calls</option>
+                <option>Booking + review automation</option>
+                <option>Everything (Premium plan)</option>
+                <option>Not sure — I want to chat</option>
+              </select>
+            </div>
+
+            <div class="form-field" style="margin-bottom:22px">
+              <label class="field-label" for="f-message">Tell me about your business</label>
+              <textarea id="f-message" rows="4" class="field-input" name="message"
+                placeholder="What do you sell? What's currently slow or broken? What would 'success' look like in 3 months?"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-grad form-submit" id="form-submit-btn">
+              Send &amp; Book My Free Call →
+            </button>
+
+            <p class="form-note">
+              By submitting, you agree to a friendly reply within one business day. No spam. Ever.
+            </p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer-wrap">
+    <div class="container">
+      <div class="footer-grid">
+
+        <!-- Brand -->
+        <div>
+          <div class="footer-logo">
+            <span class="footer-logo-bracket">&lt;/&gt;</span>
+            <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+          </div>
+          <p class="footer-tagline">
+            Smart websites. Intelligent automation. Real results — for Sydney businesses ready to grow.
+          </p>
+          <div class="footer-socials">
+            <a href="#" class="footer-social-btn">in</a>
+            <a href="#" class="footer-social-btn">ig</a>
+            <a href="https://wa.me/61413736241" class="footer-social-btn" target="_blank" rel="noopener">wa</a>
+            <a href="#" class="footer-social-btn">gh</a>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div>
+          <div class="footer-col-title">Services</div>
+          <a href="#services" class="footer-link">Website Design</a>
+          <a href="#services" class="footer-link">AI Chatbots</a>
+          <a href="#services" class="footer-link">Voice Agents</a>
+          <a href="#services" class="footer-link">Booking Systems</a>
+          <a href="#services" class="footer-link">Review Automation</a>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <div class="footer-col-title">Company</div>
+          <a href="#home"      class="footer-link">Home</a>
+          <a href="#about"     class="footer-link">About</a>
+          <a href="#portfolio" class="footer-link">Portfolio</a>
+          <a href="#pricing"   class="footer-link">Pricing</a>
+          <a href="#contact"   class="footer-link">Contact</a>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <div class="footer-col-title">Get in touch</div>
+          <a href="mailto:hello@saujantech.com.au" class="footer-link">📧 hello@saujantech.com.au</a>
+          <a href="https://wa.me/61413736241" class="footer-link" target="_blank" rel="noopener">📱 +61 413 736 241</a>
+          <a href="#contact" class="footer-link">📍 Sydney, NSW</a>
+          <a href="#contact" class="footer-link">🕘 Mon–Sat · 9am–8pm AEST</a>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 SaujanTech. ABN 62143845320 · All rights reserved.</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <span>Built with ⚡ in Sydney</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /#root -->
+
+<script src="script.js"></script>
+</body>
+</html>
