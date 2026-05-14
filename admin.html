@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SaujanTech — Inquiries Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ============================================================
+       SAUJANTECH ADMIN DASHBOARD — styles
+       ============================================================ */
+    :root {
+      --navy:     #0A0F2C;
+      --navy-2:   #0E1538;
+      --navy-3:   #0F1638;
+      --blue:     #2563EB;
+      --cyan:     #06B6D4;
+      --cyan-s:   #22D3EE;
+      --muted:    #6B7390;
+      --body:     #9CA8C7;
+      --grad:     linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+      --border:   rgba(99,130,255,0.18);
+      --border-s: rgba(99,130,255,0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100vh; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      background: var(--navy);
+      color: #E5EBF8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* ============================================================
+       LOGIN SCREEN
+       ============================================================ */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(900px 600px at 50% -10%, rgba(37,99,235,0.22), transparent 60%),
+        var(--navy);
+      background-image:
+        radial-gradient(rgba(99,130,255,0.14) 1px, transparent 1px),
+        radial-gradient(900px 600px at 50% -10%, rgba(37,99,235,0.22), transparent 60%);
+      background-size: 28px 28px, 100% 100%;
+    }
+
+    .login-card {
+      background: linear-gradient(180deg, #0F1638 0%, #0B1130 100%);
+      border: 1px solid rgba(99,130,255,0.25);
+      border-radius: 24px;
+      padding: 52px 44px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .login-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 36px;
+      color: white;
+    }
+
+    .login-brand-bracket {
+      font-family: 'Courier New', monospace;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .login-card h1 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: white;
+      margin: 0 0 8px;
+    }
+
+    .login-card p {
+      text-align: center;
+      color: var(--body);
+      font-size: 14px;
+      margin: 0 0 36px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .pw-wrap { position: relative; margin-bottom: 6px; }
+
+    .field-input {
+      width: 100%;
+      padding: 14px 48px 14px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      font-size: 15px;
+      color: white;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 4px rgba(6,182,212,0.14);
+    }
+    .field-input::placeholder { color: #3A4366; }
+
+    .pw-eye {
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 17px;
+      line-height: 1;
+      padding: 4px;
+      transition: color .15s;
+    }
+    .pw-eye:hover { color: var(--cyan-s); }
+
+    .login-error {
+      font-size: 13px;
+      color: #FCA5A5;
+      margin-bottom: 4px;
+      display: none;
+      padding: 4px 0;
+    }
+
+    .btn-login {
+      margin-top: 18px;
+      width: 100%;
+      padding: 15px;
+      background: var(--grad);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 30px -10px rgba(37,99,235,0.7);
+      transition: transform .2s, opacity .2s;
+    }
+    .btn-login:hover { transform: translateY(-2px); opacity: 0.9; }
+    .btn-login:active { transform: translateY(0); }
+
+    /* ============================================================
+       DASHBOARD
+       ============================================================ */
+    #dashboard { display: none; }
+
+    /* ─── Header ─── */
+    .dash-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(10,15,44,0.85);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      border-bottom: 1px solid var(--border-s);
+    }
+
+    .dash-header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 28px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .dash-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .dash-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .dash-logo-bracket {
+      font-family: 'Courier New', monospace;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .header-badge {
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(6,182,212,0.1);
+      color: var(--cyan-s);
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(6,182,212,0.22);
+      white-space: nowrap;
+    }
+
+    .header-total {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .header-total strong {
+      color: var(--cyan-s);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .dash-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+
+    .btn-refresh {
+      background: rgba(6,182,212,0.1);
+      color: var(--cyan-s);
+      border: 1px solid rgba(6,182,212,0.22);
+    }
+    .btn-refresh:hover { background: rgba(6,182,212,0.2); }
+    .btn-refresh.spinning { animation: spin .6s linear infinite; }
+
+    .btn-logout {
+      background: rgba(255,255,255,0.05);
+      color: var(--body);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn-logout:hover { color: white; border-color: rgba(255,255,255,0.18); }
+
+    /* ─── Main ─── */
+    .dash-main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 36px 28px 72px;
+    }
+
+    .page-heading { margin-bottom: 32px; }
+    .page-title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: white;
+      margin: 0 0 6px;
+    }
+    .page-sub { color: var(--muted); font-size: 14px; margin: 0; }
+
+    /* ─── Stats strip ─── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: linear-gradient(180deg, #0F1638 0%, #0B1130 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 26px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--grad);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .stat-value {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(160deg, #22D3EE 0%, #2563EB 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stat-value.sm { font-size: 22px; padding-top: 6px; }
+
+    .stat-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* ─── Table card ─── */
+    .table-card {
+      background: linear-gradient(180deg, #0F1638 0%, #0B1130 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .table-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--border-s);
+    }
+
+    .table-card-title { font-size: 16px; font-weight: 700; color: white; }
+    .table-card-sub   { font-size: 13px; color: var(--muted); }
+
+    /* Loading */
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 80px 24px;
+    }
+
+    .spinner {
+      width: 38px; height: 38px;
+      border: 3px solid rgba(6,182,212,0.15);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text { color: var(--muted); font-size: 14px; }
+
+    /* Empty state */
+    .empty-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 80px 24px;
+      text-align: center;
+    }
+    .empty-icon  { font-size: 52px; }
+    .empty-title { font-size: 20px; font-weight: 700; color: white; }
+    .empty-sub   { color: var(--muted); font-size: 14px; max-width: 300px; line-height: 1.55; }
+
+    /* ─── Desktop table ─── */
+    .table-scroll { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead th {
+      padding: 12px 18px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border-s);
+      white-space: nowrap;
+      background: rgba(255,255,255,0.015);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-s);
+      transition: background .12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.028); }
+
+    tbody td {
+      padding: 14px 18px;
+      font-size: 13.5px;
+      color: #D5DCF0;
+      vertical-align: middle;
+    }
+
+    .td-date  { white-space: nowrap; color: var(--muted); font-size: 12px; }
+    .td-name  { font-weight: 600; color: white; white-space: nowrap; }
+    .td-link  { color: var(--cyan-s); font-size: 13px; }
+    .td-link:hover { text-decoration: underline; }
+    .td-none  { color: var(--muted); }
+    .td-msg   { color: var(--body); font-size: 13px; max-width: 260px; }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(37,99,235,0.14);
+      color: #93C5FD;
+      border: 1px solid rgba(37,99,235,0.25);
+      white-space: nowrap;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-view {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 13px;
+      border-radius: 8px;
+      background: rgba(6,182,212,0.1);
+      color: var(--cyan-s);
+      border: 1px solid rgba(6,182,212,0.22);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .btn-view:hover { background: rgba(6,182,212,0.2); transform: translateY(-1px); }
+
+    /* ─── Mobile cards ─── */
+    .mobile-cards { display: none; }
+
+    .m-card {
+      padding: 20px 20px;
+      border-bottom: 1px solid var(--border-s);
+    }
+    .m-card:last-child { border-bottom: none; }
+
+    .m-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .m-card-name { font-weight: 700; font-size: 16px; color: white; }
+    .m-card-date { font-size: 11px; color: var(--muted); text-align: right; line-height: 1.4; flex-shrink: 0; }
+
+    .m-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--body);
+      margin-bottom: 10px;
+    }
+
+    .m-card-meta a { color: var(--cyan-s); }
+
+    .m-card-msg {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .m-card-footer { text-align: right; }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(4,7,18,0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #modal-overlay.open { display: flex; }
+
+    .modal {
+      background: linear-gradient(180deg, #0F1638 0%, #0A0F2C 100%);
+      border: 1px solid rgba(99,130,255,0.3);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 40px 100px -10px rgba(0,0,0,0.8);
+      position: relative;
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform:translateY(12px) scale(.98); } to { opacity:1; transform:none; } }
+
+    .modal-x {
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--body);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+    .modal-x:hover { background: rgba(255,255,255,0.12); color: white; }
+
+    .modal-name {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: white;
+      margin: 0 44px 6px 0;
+    }
+
+    .modal-date-line {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .modal-field-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .modal-field-value {
+      font-size: 15px;
+      color: #E5EBF8;
+      line-height: 1.5;
+    }
+
+    .modal-field-value a { color: var(--cyan-s); }
+    .modal-field-value a:hover { text-decoration: underline; }
+
+    .modal-hr { height: 1px; background: var(--border-s); margin: 22px 0; }
+
+    .modal-msg-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-s);
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 15px;
+      color: #D5DCF0;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .btn-reply {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 20px;
+      background: var(--grad);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px -8px rgba(37,99,235,0.6);
+      transition: opacity .2s, transform .2s;
+    }
+    .btn-reply:hover { opacity: .9; transform: translateY(-1px); color: white; }
+
+    .btn-modal-close {
+      padding: 13px 22px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--body);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-modal-close:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+      .stats-strip { grid-template-columns: 1fr 1fr; }
+      .stats-strip .stat-card:last-child { grid-column: 1 / -1; }
+      .stat-value.sm { font-size: 28px; }
+    }
+
+    @media (max-width: 768px) {
+      .dash-main { padding: 24px 16px 56px; }
+      .dash-header-inner { padding: 0 16px; }
+
+      /* Hide table, show cards on mobile */
+      .table-scroll table { display: none; }
+      .mobile-cards       { display: block; }
+
+      .header-total { display: none; }
+
+      .modal { padding: 28px 20px; border-radius: 20px; }
+      .modal-grid-2 { grid-template-columns: 1fr; gap: 12px; }
+      .modal-actions { flex-direction: column; }
+      .btn-reply { flex: none; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-strip { grid-template-columns: 1fr; }
+      .stats-strip .stat-card:last-child { grid-column: auto; }
+      .login-card { padding: 36px 24px; }
+      .page-title { font-size: 24px; }
+      .btn-sm span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       LOGIN SCREEN
+       ============================================================ -->
+  <div id="login-screen">
+    <div class="login-card">
+
+      <div class="login-brand">
+        <span class="login-brand-bracket">&lt;/&gt;</span>
+        <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+      </div>
+
+      <h1>Admin Access</h1>
+      <p>Enter your password to view the inquiries dashboard</p>
+
+      <label class="field-label" for="pw-input">Password</label>
+      <div class="pw-wrap">
+        <input id="pw-input" type="password" class="field-input" placeholder="••••••••••••" autocomplete="current-password" />
+        <button class="pw-eye" id="pw-eye" type="button" aria-label="Toggle password visibility">👁</button>
+      </div>
+      <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+
+      <button class="btn-login" id="btn-login">Login →</button>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DASHBOARD
+       ============================================================ -->
+  <div id="dashboard">
+
+    <!-- Header -->
+    <header class="dash-header">
+      <div class="dash-header-inner">
+
+        <div class="dash-header-left">
+          <div class="dash-logo">
+            <span class="dash-logo-bracket">&lt;/&gt;</span>
+            <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+          </div>
+          <span class="header-badge">Inquiries Dashboard</span>
+          <span class="header-total">
+            <strong id="header-count">—</strong> total inquiries
+          </span>
+        </div>
+
+        <div class="dash-header-right">
+          <button class="btn-sm btn-refresh" id="btn-refresh">
+            <span id="refresh-icon">↻</span> <span>Refresh</span>
+          </button>
+          <button class="btn-sm btn-logout" id="btn-logout">
+            ⎋ <span>Logout</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="dash-main">
+
+      <div class="page-heading">
+        <h2 class="page-title">SaujanTech — Inquiries Dashboard</h2>
+        <p class="page-sub" id="page-sub">Loading your inquiries…</p>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="stats-strip">
+
+        <div class="stat-card">
+          <div class="stat-label">Total Inquiries</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-sub">All time</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">This Week</div>
+          <div class="stat-value" id="stat-week">—</div>
+          <div class="stat-sub">Last 7 days</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Latest Inquiry</div>
+          <div class="stat-value sm" id="stat-latest">—</div>
+          <div class="stat-sub" id="stat-latest-from">—</div>
+        </div>
+
+      </div>
+
+      <!-- Inquiries table card -->
+      <div class="table-card">
+
+        <div class="table-card-head">
+          <div class="table-card-title">All Inquiries</div>
+          <div class="table-card-sub" id="table-sub">Newest first</div>
+        </div>
+
+        <!-- Loading spinner -->
+        <div class="loading-wrap" id="loading-wrap">
+          <div class="spinner"></div>
+          <div class="loading-text">Fetching inquiries from Supabase…</div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-wrap" id="empty-wrap" style="display:none">
+          <div class="empty-icon">📭</div>
+          <div class="empty-title">No inquiries yet</div>
+          <div class="empty-sub">No inquiries yet — share your website!</div>
+        </div>
+
+        <!-- Table + cards wrapper (hidden until data loads) -->
+        <div id="data-wrap" style="display:none">
+
+          <!-- Desktop table -->
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date Received</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Business Type</th>
+                  <th>Service Interested In</th>
+                  <th>Message</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- Mobile cards -->
+          <div class="mobile-cards" id="mobile-cards"></div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Full inquiry detail
+       ============================================================ -->
+  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+    <div class="modal">
+
+      <button class="modal-x" id="modal-x" aria-label="Close">✕</button>
+
+      <div class="modal-name" id="modal-name">—</div>
+      <div class="modal-date-line" id="modal-date">—</div>
+
+      <div class="modal-grid-2">
+        <div>
+          <div class="modal-field-label">Email</div>
+          <div class="modal-field-value" id="modal-email">—</div>
+        </div>
+        <div>
+          <div class="modal-field-label">Phone</div>
+          <div class="modal-field-value" id="modal-phone">—</div>
+        </div>
+      </div>
+
+      <div class="modal-grid-2">
+        <div>
+          <div class="modal-field-label">Business Type</div>
+          <div class="modal-field-value" id="modal-biz">—</div>
+        </div>
+        <div>
+          <div class="modal-field-label">Service Interested In</div>
+          <div class="modal-field-value" id="modal-service">—</div>
+        </div>
+      </div>
+
+      <div class="modal-hr"></div>
+
+      <div class="modal-field-label">Message</div>
+      <div class="modal-msg-box" id="modal-message">—</div>
+
+      <div class="modal-actions">
+        <a id="modal-reply" href="#" class="btn-reply">✉️ Reply by Email</a>
+        <button class="btn-modal-close" id="modal-close-btn">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       SAUJANTECH ADMIN — script
+       ============================================================ */
+
+    /* ─── CONFIG ─────────────────────────────────────────────── */
+    var SUPABASE_URL = 'https://dmovrefukamczvgnrdcn.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtb3ZyZWZ1a2FtY3p2Z25yZGNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjE3MzUsImV4cCI6MjA5NDI5NzczNX0.loUkLkws_DRSPcC09rwJc7PJAdx8XXbEWi_51jsYF-U';
+    var SESSION_KEY  = 'st_admin_v1';
+
+    var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    /* Stored rows for modal lookup */
+    var _rows = [];
+
+    /* ─── HELPERS ──────────────────────────────────────────────── */
+    function esc(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      var d = new Date(iso);
+      return d.toLocaleString('en-AU', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
+
+    function timeAgo(iso) {
+      if (!iso) return '—';
+      var diff = Math.floor((Date.now() - new Date(iso)) / 1000);
+      if (diff < 60)     return diff + 's ago';
+      if (diff < 3600)   return Math.floor(diff / 60) + ' min ago';
+      if (diff < 86400)  return Math.floor(diff / 3600) + ' hrs ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + ' days ago';
+      return formatDate(iso);
+    }
+
+    function truncate(s, n) {
+      if (!s) return '—';
+      s = s.trim();
+      return s.length > n ? s.slice(0, n) + '…' : s;
+    }
+
+    /* ─── AUTH ─────────────────────────────────────────────────── */
+    function loggedIn()  { return sessionStorage.getItem(SESSION_KEY) === '1'; }
+    function setLogin()  { sessionStorage.setItem(SESSION_KEY, '1'); }
+    function clearLogin(){ sessionStorage.removeItem(SESSION_KEY); }
+
+    /* ─── LOGIN ────────────────────────────────────────────────── */
+    document.getElementById('btn-login').addEventListener('click', attemptLogin);
+    document.getElementById('pw-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') attemptLogin();
+    });
+
+    function attemptLogin() {
+      var pw  = document.getElementById('pw-input').value;
+      var err = document.getElementById('login-error');
+      /* Validate against hardcoded password */
+      if (pw === atob('U2F1amFuQDI1ODA=')) {
+        err.style.display = 'none';
+        setLogin();
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard').style.display    = 'block';
+        loadInquiries();
+      } else {
+        err.style.display = 'block';
+        document.getElementById('pw-input').select();
+      }
+    }
+
+    /* Password eye toggle */
+    document.getElementById('pw-eye').addEventListener('click', function() {
+      var inp = document.getElementById('pw-input');
+      var show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      this.textContent = show ? '🙈' : '👁';
+    });
+
+    /* Logout */
+    document.getElementById('btn-logout').addEventListener('click', function() {
+      clearLogin();
+      document.getElementById('dashboard').style.display    = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('pw-input').value = '';
+    });
+
+    /* Refresh */
+    document.getElementById('btn-refresh').addEventListener('click', function() {
+      var icon = document.getElementById('refresh-icon');
+      icon.style.display = 'inline-block';
+      icon.style.animation = 'spin .6s linear infinite';
+      loadInquiries().finally(function() {
+        icon.style.animation = '';
+      });
+    });
+
+    /* ─── LOAD DATA ─────────────────────────────────────────────── */
+    async function loadInquiries() {
+      /* Reset UI to loading */
+      document.getElementById('loading-wrap').style.display = 'flex';
+      document.getElementById('empty-wrap').style.display   = 'none';
+      document.getElementById('data-wrap').style.display    = 'none';
+      document.getElementById('page-sub').textContent       = 'Loading inquiries…';
+
+      var result = await db
+        .from('inquiries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      document.getElementById('loading-wrap').style.display = 'none';
+
+      if (result.error) {
+        console.error('[Admin] Supabase error:', result.error);
+        document.getElementById('page-sub').textContent =
+          '⚠️ Could not load data. Check the browser console for details.';
+        document.getElementById('table-sub').textContent = 'Error loading';
+        return;
+      }
+
+      _rows = result.data || [];
+      console.log('[Admin] Loaded ' + _rows.length + ' inquiries:', _rows);
+
+      renderStats(_rows);
+      renderRows(_rows);
+    }
+
+    /* ─── RENDER STATS ──────────────────────────────────────────── */
+    function renderStats(rows) {
+      var total      = rows.length;
+      var cutoff     = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      var thisWeek   = rows.filter(function(r) { return new Date(r.created_at) > cutoff; }).length;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-week').textContent  = thisWeek;
+      document.getElementById('header-count').textContent = total;
+
+      if (total > 0) {
+        var latest = rows[0];
+        document.getElementById('stat-latest').textContent      = timeAgo(latest.created_at);
+        document.getElementById('stat-latest-from').textContent = 'from ' + (latest.name || 'Unknown');
+        document.getElementById('page-sub').textContent =
+          total + ' total inquir' + (total === 1 ? 'y' : 'ies') +
+          ' · Refreshed at ' + new Date().toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit', hour12:true });
+      } else {
+        document.getElementById('stat-latest').textContent      = '—';
+        document.getElementById('stat-latest-from').textContent = 'No inquiries yet';
+        document.getElementById('page-sub').textContent = 'No inquiries received yet.';
+      }
+    }
+
+    /* ─── RENDER TABLE + CARDS ──────────────────────────────────── */
+    function renderRows(rows) {
+      var count = rows.length;
+      document.getElementById('table-sub').textContent =
+        count + ' inquir' + (count === 1 ? 'y' : 'ies') + ' · Newest first';
+
+      if (count === 0) {
+        document.getElementById('empty-wrap').style.display = 'flex';
+        document.getElementById('data-wrap').style.display  = 'none';
+        return;
+      }
+
+      document.getElementById('empty-wrap').style.display = 'none';
+      document.getElementById('data-wrap').style.display  = 'block';
+
+      /* ── Desktop table ── */
+      var tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+      rows.forEach(function(r, i) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="td-date">' + esc(formatDate(r.created_at)) + '</td>' +
+          '<td class="td-name">'  + esc(r.name || '—') + '</td>' +
+          '<td>' + (r.email ? '<a class="td-link" href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '<span class="td-none">—</span>') + '</td>' +
+          '<td>' + (r.phone ? '<a class="td-link" href="tel:' + esc(r.phone) + '">' + esc(r.phone) + '</a>' : '<span class="td-none">—</span>') + '</td>' +
+          '<td><span class="pill">' + esc(r.business_type || '—') + '</span></td>' +
+          '<td style="font-size:13px;color:var(--body);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(r.service_interested || '—') + '</td>' +
+          '<td class="td-msg">' + esc(truncate(r.message, 60)) + '</td>' +
+          '<td><button class="btn-view" data-i="' + i + '">View →</button></td>';
+        tbody.appendChild(tr);
+      });
+
+      /* ── Mobile cards ── */
+      var mobileCards = document.getElementById('mobile-cards');
+      mobileCards.innerHTML = '';
+      rows.forEach(function(r, i) {
+        var card = document.createElement('div');
+        card.className = 'm-card';
+        card.innerHTML =
+          '<div class="m-card-top">' +
+            '<div class="m-card-name">' + esc(r.name || '—') + '</div>' +
+            '<div class="m-card-date">' + esc(formatDate(r.created_at)) + '</div>' +
+          '</div>' +
+          '<div class="m-card-meta">' +
+            '<span>📧 ' + (r.email ? '<a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '—') + '</span>' +
+            (r.phone ? '<span>📱 <a href="tel:' + esc(r.phone) + '">' + esc(r.phone) + '</a></span>' : '') +
+            '<span>🏢 ' + esc(r.business_type || '—') + '</span>' +
+            '<span>🎯 ' + esc(r.service_interested || '—') + '</span>' +
+          '</div>' +
+          '<div class="m-card-msg">' + esc(truncate(r.message, 90)) + '</div>' +
+          '<div class="m-card-footer"><button class="btn-view" data-i="' + i + '">View full inquiry →</button></div>';
+        mobileCards.appendChild(card);
+      });
+
+      /* Attach all View buttons */
+      document.querySelectorAll('.btn-view').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          openModal(_rows[parseInt(this.getAttribute('data-i'), 10)]);
+        });
+      });
+    }
+
+    /* ─── MODAL ─────────────────────────────────────────────────── */
+    function openModal(r) {
+      document.getElementById('modal-name').textContent = r.name || '—';
+      document.getElementById('modal-date').textContent = 'Received ' + formatDate(r.created_at);
+      document.getElementById('modal-biz').textContent     = r.business_type || '—';
+      document.getElementById('modal-service').textContent = r.service_interested || '—';
+      document.getElementById('modal-message').textContent = r.message || '—';
+
+      document.getElementById('modal-email').innerHTML = r.email
+        ? '<a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a>' : '—';
+      document.getElementById('modal-phone').innerHTML = r.phone
+        ? '<a href="tel:' + esc(r.phone) + '">' + esc(r.phone) + '</a>' : '—';
+
+      var subject = encodeURIComponent('Re: Your SaujanTech Inquiry');
+      var body    = encodeURIComponent(
+        'Hi ' + (r.name || 'there') + ',\n\n' +
+        'Thank you for getting in touch with SaujanTech!\n\n' +
+        'I\'ve reviewed your inquiry about "' + (r.service_interested || '') + '" ' +
+        'and I\'d love to chat.\n\n' +
+        'Best regards,\nSaujan\nSaujanTech\nhello@saujantech.com.au\n+61 413 736 241'
+      );
+      document.getElementById('modal-reply').href =
+        'mailto:' + (r.email || '') + '?subject=' + subject + '&body=' + body;
+
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('modal-x').addEventListener('click', closeModal);
+    document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    /* ─── INIT ───────────────────────────────────────────────────── */
+    if (loggedIn()) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display    = 'block';
+      loadInquiries();
+    }
+  </script>
+</body>
+</html>
