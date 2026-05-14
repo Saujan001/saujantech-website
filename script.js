@@ -2,6 +2,11 @@
    SAUJANTECH PORTFOLIO — script.js
    ============================================================ */
 
+const supabaseClient = window.supabase.createClient(
+  'https://dmovrefukamczvgnrdcn.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtb3ZyZWZ1a2FtY3p2Z25yZGNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjE3MzUsImV4cCI6MjA5NDI5NzczNX0.loUkLkws_DRSPcC09rwJc7PJAdx8XXbEWi_51jsYF-U'
+);
+
 /* ─── NAV: scroll-triggered glass effect ──────────────────── */
 (function () {
   var nav = document.getElementById('nav');
@@ -138,14 +143,14 @@
   });
 })();
 
-/* ─── CONTACT FORM: validation + success state ───────────── */
+/* ─── CONTACT FORM: validation + Supabase save ───────────── */
 (function () {
   var form      = document.getElementById('contact-form');
   var submitBtn = document.getElementById('form-submit-btn');
 
   if (!form) return;
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     /* Basic required-field check */
@@ -163,12 +168,48 @@
     });
     if (invalid) return;
 
-    /* Success state */
-    submitBtn.textContent = '✅ Got it — I\'ll be in touch within 24h';
+    /* Loading state while saving */
+    submitBtn.textContent = 'Sending…';
     submitBtn.disabled    = true;
+    submitBtn.style.opacity = '0.75';
+
+    var payload = {
+      name:              document.getElementById('f-name').value.trim(),
+      email:             document.getElementById('f-email').value.trim(),
+      phone:             document.getElementById('f-phone').value.trim() || null,
+      business_type:     document.getElementById('f-biz').value,
+      service_interested:document.getElementById('f-service').value,
+      message:           document.getElementById('f-message').value.trim()
+    };
+
+    console.log('[SaujanTech] Submitting inquiry to Supabase…', payload);
+
+    var result = await supabaseClient
+      .from('inquiries')
+      .insert([payload]);
+
+    console.log('[SaujanTech] Supabase response:', result);
+
+    if (result.error) {
+      console.error('[SaujanTech] Save failed:', result.error);
+      submitBtn.textContent   = 'Something went wrong. Please email hello@saujantech.com.au';
+      submitBtn.style.opacity = '1';
+      submitBtn.style.background = '#EF4444';
+      /* Re-enable after 6 s so they can try again */
+      setTimeout(function () {
+        submitBtn.innerHTML        = 'Send &amp; Book My Free Call →';
+        submitBtn.disabled         = false;
+        submitBtn.style.opacity    = '';
+        submitBtn.style.background = '';
+      }, 6000);
+      return;
+    }
+
+    /* Success — confirmed saved */
+    console.log('[SaujanTech] Inquiry saved successfully ✅');
+    submitBtn.textContent   = '✅ Got it — I\'ll be in touch within 24h';
     submitBtn.style.opacity = '0.85';
 
-    /* Reset after 4.5 s */
     setTimeout(function () {
       form.reset();
       submitBtn.innerHTML  = 'Send &amp; Book My Free Call →';
