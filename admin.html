@@ -687,9 +687,175 @@
       .page-title { font-size: 24px; }
       .btn-sm span { display: none; }
     }
+
+    /* ============================================================
+       THEME TOGGLE BUTTON
+       ============================================================ */
+    .btn-theme {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #C7D2FE;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-theme:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); color: white; }
+
+    /* Floating button — login screen only */
+    .btn-theme-float {
+      position: fixed;
+      top: 16px; right: 16px;
+      z-index: 200;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: white;
+      font-size: 19px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .btn-theme-float:hover { background: rgba(255,255,255,0.16); transform: scale(1.06); }
+
+    /* Hide the floating button once dashboard is visible */
+    #dashboard.visible ~ .btn-theme-float { display: none; }
+
+    /* ============================================================
+       LIGHT THEME OVERRIDES  (html[data-theme="light"])
+       ============================================================ */
+    html[data-theme="light"] body {
+      background: #EEF2FF;
+      color: #0B1020;
+    }
+
+    /* Login */
+    html[data-theme="light"] #login-screen {
+      background: #EEF2FF;
+      background-image:
+        radial-gradient(rgba(37,99,235,0.07) 1px, transparent 1px),
+        radial-gradient(600px 400px at 50% 0%, rgba(37,99,235,0.09), transparent 60%);
+      background-size: 28px 28px, 100% 100%;
+    }
+    html[data-theme="light"] .login-card {
+      background: white;
+      border-color: #D1DCF9;
+      box-shadow: 0 20px 60px -20px rgba(37,99,235,0.1), 0 2px 8px rgba(37,99,235,0.04);
+    }
+    html[data-theme="light"] .login-card h1 { color: #0B1020; }
+    html[data-theme="light"] .login-card p  { color: #6B7390; }
+    html[data-theme="light"] .field-label   { color: #6B7390; }
+    html[data-theme="light"] .field-input {
+      background: #F8FAFF;
+      border-color: #D1DCF9;
+      color: #0B1020;
+    }
+    html[data-theme="light"] .field-input::placeholder { color: #9AA3BD; }
+    html[data-theme="light"] .field-input:focus { background: white; }
+    html[data-theme="light"] .pw-eye { color: #9AA3BD; }
+
+    /* Header */
+    html[data-theme="light"] .dash-header {
+      background: rgba(255,255,255,0.92);
+      border-bottom-color: #DDE5FF;
+    }
+    html[data-theme="light"] .dash-logo       { color: #0B1020; }
+    html[data-theme="light"] .header-total    { color: #6B7390; }
+    html[data-theme="light"] .header-badge    { background: rgba(6,182,212,0.06); border-color: rgba(6,182,212,0.18); }
+    html[data-theme="light"] .btn-theme       { background: #F0F4FF; border-color: #D1DCF9; color: #3A4366; }
+    html[data-theme="light"] .btn-theme:hover { background: #DDE5FF; color: #0B1020; }
+    html[data-theme="light"] .btn-refresh     { background: rgba(6,182,212,0.07); border-color: rgba(6,182,212,0.18); }
+    html[data-theme="light"] .btn-logout      { background: #F0F4FF; border-color: #D1DCF9; color: #6B7390; }
+    html[data-theme="light"] .btn-logout:hover { background: #DDE5FF; color: #0B1020; }
+    html[data-theme="light"] .btn-theme-float { background: rgba(11,16,32,0.06); border-color: rgba(11,16,32,0.1); color: #0B1020; }
+    html[data-theme="light"] .btn-theme-float:hover { background: rgba(11,16,32,0.1); }
+
+    /* Page heading */
+    html[data-theme="light"] .page-title { color: #0B1020; }
+    html[data-theme="light"] .page-sub   { color: #6B7390; }
+
+    /* Stat cards */
+    html[data-theme="light"] .stat-card {
+      background: white;
+      border-color: #D1DCF9;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.05);
+    }
+    html[data-theme="light"] .stat-label { color: #6B7390; }
+    html[data-theme="light"] .stat-sub   { color: #9AA3BD; }
+
+    /* Table card */
+    html[data-theme="light"] .table-card {
+      background: white;
+      border-color: #D1DCF9;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.05);
+    }
+    html[data-theme="light"] .table-card-head  { border-bottom-color: #EEF2FF; }
+    html[data-theme="light"] .table-card-title { color: #0B1020; }
+    html[data-theme="light"] .table-card-sub   { color: #6B7390; }
+    html[data-theme="light"] .loading-text     { color: #6B7390; }
+    html[data-theme="light"] .empty-title      { color: #0B1020; }
+    html[data-theme="light"] .empty-sub        { color: #6B7390; }
+
+    /* Table rows */
+    html[data-theme="light"] thead th {
+      background: #F5F7FF;
+      color: #6B7390;
+      border-bottom-color: #EEF2FF;
+    }
+    html[data-theme="light"] tbody tr           { border-bottom-color: #EEF2FF; }
+    html[data-theme="light"] tbody tr:hover     { background: #F5F7FF; }
+    html[data-theme="light"] tbody td           { color: #1B2342; }
+    html[data-theme="light"] .td-date           { color: #6B7390; }
+    html[data-theme="light"] .td-name           { color: #0B1020; }
+    html[data-theme="light"] .td-link           { color: var(--blue); }
+    html[data-theme="light"] .td-msg            { color: #6B7390; }
+    html[data-theme="light"] .td-none           { color: #9AA3BD; }
+    html[data-theme="light"] .pill              { background: rgba(37,99,235,0.07); color: var(--blue); border-color: rgba(37,99,235,0.18); }
+    html[data-theme="light"] .btn-view          { background: rgba(6,182,212,0.07); border-color: rgba(6,182,212,0.2); }
+
+    /* Mobile cards */
+    html[data-theme="light"] .m-card        { border-bottom-color: #EEF2FF; }
+    html[data-theme="light"] .m-card-name   { color: #0B1020; }
+    html[data-theme="light"] .m-card-date   { color: #9AA3BD; }
+    html[data-theme="light"] .m-card-meta   { color: #6B7390; }
+    html[data-theme="light"] .m-card-msg    { color: #9AA3BD; }
+
+    /* Modal */
+    html[data-theme="light"] #modal-overlay { background: rgba(11,16,32,0.4); }
+    html[data-theme="light"] .modal {
+      background: white;
+      border-color: #D1DCF9;
+      box-shadow: 0 30px 80px -10px rgba(37,99,235,0.14);
+    }
+    html[data-theme="light"] .modal-x             { background: #F0F4FF; border-color: #D1DCF9; color: #6B7390; }
+    html[data-theme="light"] .modal-x:hover       { background: #DDE5FF; color: #0B1020; }
+    html[data-theme="light"] .modal-name          { color: #0B1020; }
+    html[data-theme="light"] .modal-date-line     { color: #6B7390; }
+    html[data-theme="light"] .modal-field-label   { color: #9AA3BD; }
+    html[data-theme="light"] .modal-field-value   { color: #0B1020; }
+    html[data-theme="light"] .modal-field-value a { color: var(--blue); }
+    html[data-theme="light"] .modal-hr            { background: #EEF2FF; }
+    html[data-theme="light"] .modal-msg-box       { background: #F5F7FF; border-color: #DDE5FF; color: #1B2342; }
+    html[data-theme="light"] .btn-modal-close     { background: #F0F4FF; border-color: #D1DCF9; color: #6B7390; }
+    html[data-theme="light"] .btn-modal-close:hover { background: #DDE5FF; color: #0B1020; }
   </style>
 </head>
 <body>
+
+  <!-- Floating theme toggle (login screen) -->
+  <button class="btn-theme-float" id="btn-theme-float" aria-label="Toggle theme" title="Toggle light / dark mode">☀️</button>
 
   <!-- ============================================================
        LOGIN SCREEN
@@ -738,6 +904,7 @@
         </div>
 
         <div class="dash-header-right">
+          <button class="btn-theme" id="btn-theme" aria-label="Toggle theme" title="Toggle light / dark mode">☀️ <span>Light</span></button>
           <button class="btn-sm btn-refresh" id="btn-refresh">
             <span id="refresh-icon">↻</span> <span>Refresh</span>
           </button>
@@ -1138,6 +1305,35 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeModal();
     });
+
+    /* ─── THEME TOGGLE ──────────────────────────────────────────── */
+    var THEME_KEY = 'st_admin_theme';
+
+    function getTheme()  { return localStorage.getItem(THEME_KEY) || 'dark'; }
+    function saveTheme(t){ localStorage.setItem(THEME_KEY, t); }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      var dark = theme === 'dark';
+      /* Header button */
+      var hBtn = document.getElementById('btn-theme');
+      if (hBtn) { hBtn.innerHTML = dark ? '☀️ <span>Light</span>' : '🌙 <span>Dark</span>'; }
+      /* Floating button */
+      var fBtn = document.getElementById('btn-theme-float');
+      if (fBtn) { fBtn.textContent = dark ? '☀️' : '🌙'; fBtn.title = dark ? 'Switch to light mode' : 'Switch to dark mode'; }
+    }
+
+    function toggleTheme() {
+      var next = getTheme() === 'dark' ? 'light' : 'dark';
+      saveTheme(next);
+      applyTheme(next);
+    }
+
+    document.getElementById('btn-theme').addEventListener('click', toggleTheme);
+    document.getElementById('btn-theme-float').addEventListener('click', toggleTheme);
+
+    /* Apply saved theme immediately */
+    applyTheme(getTheme());
 
     /* ─── INIT ───────────────────────────────────────────────────── */
     if (loggedIn()) {
