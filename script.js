@@ -143,43 +143,164 @@ const supabaseClient = window.supabase.createClient(
   });
 })();
 
-/* ─── CONTACT FORM: validation + Supabase save ───────────── */
+/* ─── AUTOMATION CARDS: fade-in on scroll ────────────────── */
 (function () {
-  var form      = document.getElementById('contact-form');
-  var submitBtn = document.getElementById('form-submit-btn');
+  var cards = document.querySelectorAll('.automate-card');
+  if (!cards.length) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var card = entry.target;
+      var idx  = parseInt(card.getAttribute('data-group'), 10) || 0;
+
+      setTimeout(function () {
+        card.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+        card.classList.add('visible');
+
+        /* Slide service items in from left after card appears */
+        card.querySelectorAll('.automate-service').forEach(function (svc, i) {
+          svc.style.opacity   = '0';
+          svc.style.transform = 'translateX(-16px)';
+          setTimeout(function () {
+            svc.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+            svc.style.opacity    = '1';
+            svc.style.transform  = 'translateX(0)';
+          }, i * 80);
+        });
+      }, idx * 150);
+
+      observer.unobserve(card);
+    });
+  }, { threshold: 0.15 });
+
+  cards.forEach(function (card) { observer.observe(card); });
+})();
+
+/* ─── CONTACT FORM: enhanced validation + Supabase save ─── */
+(function () {
+  var form       = document.getElementById('contact-form');
+  var submitBtn  = document.getElementById('form-submit-btn');
+  var successBox = document.getElementById('form-success-box');
 
   if (!form) return;
 
+  var emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var phoneRx = /^(\+61|0)[0-9\s\-]{8,13}$/;
+
+  /* ── Helpers ── */
+  function showError(id, show) {
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle('show', show);
+  }
+
+  function markField(el, valid) {
+    el.classList.toggle('valid',   valid);
+    el.classList.toggle('invalid', !valid);
+  }
+
+  function clearField(el, errorId) {
+    el.classList.remove('valid', 'invalid');
+    showError(errorId, false);
+  }
+
+  function shakeField(el) {
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+    el.addEventListener('animationend', function () {
+      el.classList.remove('shake');
+    }, { once: true });
+  }
+
+  /* ── Validators ── */
+  function validateName(el) {
+    var v  = el.value.trim();
+    var ok = v.length >= 2 && /^[A-Za-z\s]+$/.test(v);
+    markField(el, ok);
+    showError('error-name', !ok);
+    return ok;
+  }
+
+  function validateEmail(el) {
+    var ok = emailRx.test(el.value.trim());
+    markField(el, ok);
+    showError('error-email', !ok);
+    return ok;
+  }
+
+  function validatePhone(el) {
+    var v = el.value.trim();
+    if (!v) { clearField(el, 'error-phone'); return true; }
+    var ok = phoneRx.test(v);
+    markField(el, ok);
+    showError('error-phone', !ok);
+    return ok;
+  }
+
+  function validateSelect(el, errorId) {
+    var ok = el.value !== '';
+    markField(el, ok);
+    showError(errorId, !ok);
+    return ok;
+  }
+
+  /* ── Field references ── */
+  var nameEl    = document.getElementById('f-name');
+  var emailEl   = document.getElementById('f-email');
+  var phoneEl   = document.getElementById('f-phone');
+  var bizEl     = document.getElementById('f-biz');
+  var serviceEl = document.getElementById('f-service');
+
+  /* ── Real-time listeners ── */
+  nameEl.addEventListener('blur',  function () { validateName(nameEl); });
+  nameEl.addEventListener('input', function () {
+    if (nameEl.classList.contains('invalid')) validateName(nameEl);
+  });
+
+  emailEl.addEventListener('blur',  function () { validateEmail(emailEl); });
+  emailEl.addEventListener('input', function () {
+    if (emailEl.value.length >= 5) validateEmail(emailEl);
+  });
+
+  phoneEl.addEventListener('blur',  function () { validatePhone(phoneEl); });
+  phoneEl.addEventListener('input', function () {
+    if (phoneEl.value.length >= 5) validatePhone(phoneEl);
+  });
+
+  bizEl.addEventListener('change',     function () { validateSelect(bizEl,     'error-biz');     });
+  serviceEl.addEventListener('change', function () { validateSelect(serviceEl, 'error-service'); });
+
+  /* ── Submit ── */
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    /* Basic required-field check */
-    var invalid = false;
-    form.querySelectorAll('[required]').forEach(function (field) {
-      if (!field.value.trim()) {
-        field.style.borderColor = '#EF4444';
-        field.style.boxShadow   = '0 0 0 4px rgba(239,68,68,0.12)';
-        invalid = true;
-        field.addEventListener('input', function () {
-          field.style.borderColor = '';
-          field.style.boxShadow   = '';
-        }, { once: true });
-      }
-    });
-    if (invalid) return;
+    var ok1 = validateName(nameEl);
+    var ok2 = validateEmail(emailEl);
+    var ok3 = validatePhone(phoneEl);
+    var ok4 = validateSelect(bizEl,     'error-biz');
+    var ok5 = validateSelect(serviceEl, 'error-service');
 
-    /* Loading state while saving */
-    submitBtn.textContent = 'Sending…';
-    submitBtn.disabled    = true;
+    if (!ok1 || !ok2 || !ok3 || !ok4 || !ok5) {
+      var firstInvalid = form.querySelector('.field-input.invalid');
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        shakeField(firstInvalid);
+      }
+      return;
+    }
+
+    submitBtn.textContent   = 'Sending…';
+    submitBtn.disabled      = true;
     submitBtn.style.opacity = '0.75';
 
     var payload = {
-      name:              document.getElementById('f-name').value.trim(),
-      email:             document.getElementById('f-email').value.trim(),
-      phone:             document.getElementById('f-phone').value.trim() || null,
-      business_type:     document.getElementById('f-biz').value,
-      service_interested:document.getElementById('f-service').value,
-      message:           document.getElementById('f-message').value.trim()
+      name:               nameEl.value.trim(),
+      email:              emailEl.value.trim(),
+      phone:              phoneEl.value.trim() || null,
+      business_type:      bizEl.value,
+      service_interested: serviceEl.value,
+      message:            document.getElementById('f-message').value.trim()
     };
 
     console.log('[SaujanTech] Submitting inquiry to Supabase…', payload);
@@ -192,30 +313,42 @@ const supabaseClient = window.supabase.createClient(
 
     if (result.error) {
       console.error('[SaujanTech] Save failed:', result.error);
-      submitBtn.textContent   = 'Something went wrong. Please email hello@saujantech.com.au';
-      submitBtn.style.opacity = '1';
+      submitBtn.textContent      = '❌ Try Again';
+      submitBtn.style.opacity    = '1';
       submitBtn.style.background = '#EF4444';
-      /* Re-enable after 6 s so they can try again */
+      submitBtn.disabled         = false;
       setTimeout(function () {
         submitBtn.innerHTML        = 'Send &amp; Book My Free Call →';
-        submitBtn.disabled         = false;
-        submitBtn.style.opacity    = '';
         submitBtn.style.background = '';
-      }, 6000);
+      }, 5000);
       return;
     }
 
-    /* Success — confirmed saved */
     console.log('[SaujanTech] Inquiry saved successfully ✅');
-    submitBtn.textContent   = '✅ Got it — I\'ll be in touch within 24h';
-    submitBtn.style.opacity = '0.85';
+
+    submitBtn.textContent      = '✅ Sent!';
+    submitBtn.style.background = '#10B981';
+    submitBtn.style.opacity    = '1';
+
+    if (successBox) {
+      successBox.classList.add('show');
+      successBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
     setTimeout(function () {
       form.reset();
-      submitBtn.innerHTML  = 'Send &amp; Book My Free Call →';
-      submitBtn.disabled   = false;
-      submitBtn.style.opacity = '';
-    }, 4500);
+      form.querySelectorAll('.field-input').forEach(function (f) {
+        f.classList.remove('valid', 'invalid');
+      });
+      form.querySelectorAll('.field-error').forEach(function (errEl) {
+        errEl.classList.remove('show');
+      });
+      submitBtn.innerHTML        = 'Send &amp; Book My Free Call →';
+      submitBtn.disabled         = false;
+      submitBtn.style.opacity    = '';
+      submitBtn.style.background = '';
+      if (successBox) successBox.classList.remove('show');
+    }, 5000);
   });
 })();
 
