@@ -1718,3 +1718,30 @@ textarea.field-input { resize: vertical; font-family: 'Inter', sans-serif; }
 .form-success-box.show {
   display: block;
 }
+
+/* MOBILE SERVICES GRID FIX — 2 columns on mobile */
+@media (max-width: 768px) {
+  .services-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .service-card {
+    padding: 14px 10px !important;
+  }
+
+  .service-card h3 {
+    font-size: 13px !important;
+  }
+
+  .service-card p {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .service-icon,
+  .service-card .icon {
+    font-size: 26px !important;
+  }
+}
