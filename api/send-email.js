@@ -25,12 +25,13 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Priority': '1'
       },
       body: JSON.stringify({
         from: 'Saujan — SaujanTech <hello@saujantech.com.au>',
         to: [email],
-        subject: 'Got your message — SaujanTech will be in touch!',
+        subject: `Hi ${name}, I received your enquiry — Saujan from SaujanTech`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
             <div style="background:#0A0F2C;padding:32px;text-align:center;border-radius:8px 8px 0 0;">
@@ -65,7 +66,8 @@ export default async function handler(req, res) {
               <p style="color:#94A3B8;margin:0;font-size:12px;">© 2026 SaujanTech · Sydney, Australia 🇦🇺 · saujantech.com.au</p>
             </div>
           </div>
-        `
+        `,
+        text: `Hi ${name}, thanks for contacting SaujanTech. I received your enquiry and will get back to you within 24 hours. — Saujan | hello@saujantech.com.au | saujantech.com.au`
       })
     });
 
