@@ -64,6 +64,10 @@ export default async function handler(req, res) {
             </div>
             <div style="background:#0A0F2C;padding:20px;text-align:center;border-radius:0 0 8px 8px;">
               <p style="color:#94A3B8;margin:0;font-size:12px;">© 2026 SaujanTech · Sydney, Australia 🇦🇺 · saujantech.com.au</p>
+              <p style="color:#94A3B8;margin:8px 0 0;font-size:11px;text-align:center;">
+                This email was sent because you contacted us at saujantech.com.au.<br>
+                If this was not you please ignore this email.
+              </p>
             </div>
           </div>
         `,
