@@ -1506,7 +1506,11 @@ textarea.field-input { resize: vertical; font-family: 'Inter', sans-serif; }
 
   /* Services */
   .services-wrap { padding: 80px 0; }
-  .services-grid { grid-template-columns: 1fr; }
+  .services-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .service-card { padding: 16px 12px; }
+  .service-card .service-icon { font-size: 28px; }
+  .service-card h3 { font-size: 13px; }
+  .service-card p  { font-size: 12px; line-height: 1.4; }
 
   /* Steps */
   .steps-wrap { padding: 80px 0; }
