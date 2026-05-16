@@ -327,6 +327,30 @@ const supabaseClient = window.supabase.createClient(
 
     console.log('[SaujanTech] Inquiry saved successfully ✅');
 
+    /* Send emails via Resend API — form success is not blocked if this fails */
+    try {
+      var emailRes = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name:               payload.name,
+          email:              payload.email,
+          phone:              payload.phone || '',
+          business_type:      payload.business_type,
+          service_interested: payload.service_interested,
+          message:            payload.message || ''
+        })
+      });
+      var emailResult = await emailRes.json();
+      if (!emailRes.ok) {
+        console.error('[SaujanTech] Email error:', emailResult);
+      } else {
+        console.log('[SaujanTech] Emails sent:', emailResult);
+      }
+    } catch (emailError) {
+      console.error('[SaujanTech] Email fetch error:', emailError);
+    }
+
     submitBtn.textContent      = '✅ Sent!';
     submitBtn.style.background = '#10B981';
     submitBtn.style.opacity    = '1';
