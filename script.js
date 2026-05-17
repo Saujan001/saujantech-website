@@ -377,6 +377,201 @@ const supabaseClient = window.supabase.createClient(
   });
 })();
 
+// ================================
+// CONSULTATION MODAL
+// ================================
+
+const modal = document.getElementById('consultation-modal');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const modalForm = document.getElementById('modal-contact-form');
+const modalSubmitBtn = document.getElementById('modal-submit-btn');
+const modalBtnText = document.getElementById('modal-btn-text');
+const modalSuccess = document.getElementById('modal-success');
+const modalError = document.getElementById('modal-error');
+
+// Open modal function
+function openModal() {
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    document.getElementById('modal-name').focus();
+  }, 300);
+}
+
+// Close modal function
+function closeModal() {
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  modalForm.reset();
+  modalSuccess.style.display = 'none';
+  modalError.style.display = 'none';
+  modalBtnText.textContent = 'Book My Free Consultation →';
+  modalSubmitBtn.disabled = false;
+  document.querySelectorAll('.modal-field input, .modal-field select').forEach(el => {
+    el.classList.remove('valid', 'invalid');
+  });
+  document.querySelectorAll('.modal-field-error').forEach(el => {
+    el.textContent = '';
+  });
+}
+
+// Find ALL buttons that say Get Free Consultation or Book Free Call
+// and attach the open modal function to them
+document.querySelectorAll('a[href="#contact"], .cta-btn, .nav-cta, .consultation-btn').forEach(btn => {
+  const text = btn.textContent.toLowerCase();
+  if (text.includes('consultation') || text.includes('free call') || text.includes('book')) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal();
+    });
+  }
+});
+
+// Also find the button by text content anywhere on the page
+document.querySelectorAll('button, a').forEach(btn => {
+  if (btn.textContent.trim().toLowerCase().includes('get free consultation')) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal();
+    });
+  }
+});
+
+// Close on X button
+modalCloseBtn.addEventListener('click', closeModal);
+
+// Close on clicking dark overlay outside modal
+modal.addEventListener('click', function(e) {
+  if (e.target === modal) closeModal();
+});
+
+// Close on pressing Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && modal.classList.contains('active')) {
+    closeModal();
+  }
+});
+
+// Modal form validation
+function validateModalField(input, errorId, rules) {
+  const error = document.getElementById(errorId);
+  const value = input.value.trim();
+  let message = '';
+
+  if (rules.required && !value) {
+    message = rules.requiredMsg || 'This field is required';
+  } else if (rules.email && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    message = 'Please enter a valid email — e.g. hello@gmail.com';
+  } else if (rules.phone && value && !/^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,4}[-\s\.]?[0-9]{1,9}$/.test(value)) {
+    message = 'Please enter a valid phone number — numbers only';
+  }
+
+  if (error) error.textContent = message;
+  input.classList.toggle('invalid', !!message);
+  input.classList.toggle('valid', !message && !!value);
+  return !message;
+}
+
+// Validate on blur
+document.getElementById('modal-name').addEventListener('blur', function() {
+  validateModalField(this, 'modal-name-error', { required: true, requiredMsg: 'Please enter your name' });
+});
+document.getElementById('modal-email').addEventListener('blur', function() {
+  validateModalField(this, 'modal-email-error', { required: true, email: true });
+});
+document.getElementById('modal-phone').addEventListener('blur', function() {
+  validateModalField(this, 'modal-phone-error', { phone: true });
+});
+document.getElementById('modal-business').addEventListener('blur', function() {
+  validateModalField(this, 'modal-business-error', { required: true, requiredMsg: 'Please select your business type' });
+});
+document.getElementById('modal-service').addEventListener('blur', function() {
+  validateModalField(this, 'modal-service-error', { required: true, requiredMsg: 'Please select a service' });
+});
+
+// Real time email validation
+document.getElementById('modal-email').addEventListener('input', function() {
+  if (this.value.length > 5) {
+    validateModalField(this, 'modal-email-error', { email: true });
+  }
+});
+
+// Modal form submit
+modalForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  // Validate all required fields
+  const nameValid = validateModalField(document.getElementById('modal-name'), 'modal-name-error', { required: true, requiredMsg: 'Please enter your name' });
+  const emailValid = validateModalField(document.getElementById('modal-email'), 'modal-email-error', { required: true, email: true });
+  const businessValid = validateModalField(document.getElementById('modal-business'), 'modal-business-error', { required: true, requiredMsg: 'Please select your business type' });
+  const serviceValid = validateModalField(document.getElementById('modal-service'), 'modal-service-error', { required: true, requiredMsg: 'Please select a service' });
+
+  if (!nameValid || !emailValid || !businessValid || !serviceValid) {
+    const firstInvalid = modalForm.querySelector('.invalid');
+    if (firstInvalid) firstInvalid.focus();
+    return;
+  }
+
+  // Show loading state
+  modalSubmitBtn.disabled = true;
+  modalBtnText.textContent = 'Sending...';
+  modalSuccess.style.display = 'none';
+  modalError.style.display = 'none';
+
+  const formData = {
+    name: document.getElementById('modal-name').value.trim(),
+    email: document.getElementById('modal-email').value.trim(),
+    phone: document.getElementById('modal-phone').value.trim(),
+    business_type: document.getElementById('modal-business').value,
+    service_interested: document.getElementById('modal-service').value,
+    message: document.getElementById('modal-message').value.trim()
+  };
+
+  try {
+    // Save to Supabase
+    const { error: dbError } = await supabaseClient
+      .from('inquiries')
+      .insert([formData]);
+
+    if (dbError) throw dbError;
+
+    // Send emails via Resend
+    try {
+      const emailRes = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const emailResult = await emailRes.json();
+      if (!emailRes.ok) {
+        console.error('Email error:', emailResult);
+      } else {
+        console.log('Emails sent:', emailResult);
+      }
+    } catch (emailError) {
+      console.error('Email fetch error:', emailError);
+    }
+
+    // Show success
+    modalBtnText.textContent = '✅ Sent!';
+    modalSuccess.style.display = 'block';
+    modalForm.reset();
+
+    // Auto close after 4 seconds
+    setTimeout(() => {
+      closeModal();
+    }, 4000);
+
+  } catch (err) {
+    console.error('Form error:', err);
+    modalBtnText.textContent = '❌ Try Again';
+    modalSubmitBtn.disabled = false;
+    modalError.style.display = 'block';
+  }
+});
+
 /* ─── SMOOTH ANCHOR SCROLL (fallback for older browsers) ─── */
 (function () {
   /* Modern browsers already handle scroll-behavior: smooth in CSS.

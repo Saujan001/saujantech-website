@@ -840,5 +840,94 @@
 </div><!-- /#root -->
 
 <script src="script.js"></script>
+
+<!-- CONSULTATION POPUP MODAL -->
+<div id="consultation-modal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <!-- Close button -->
+    <button class="modal-close" id="modal-close-btn" aria-label="Close modal">✕</button>
+
+    <!-- Modal header -->
+    <div class="modal-header">
+      <span class="modal-badge">⚡ Free Consultation</span>
+      <h2 id="modal-title">Let's Build Something Amazing</h2>
+      <p>Tell me about your business and I will get back to you within 24 hours.</p>
+    </div>
+
+    <!-- Modal form -->
+    <form id="modal-contact-form" class="modal-form" novalidate>
+
+      <div class="modal-form-row">
+        <div class="modal-field">
+          <label for="modal-name">Your Name *</label>
+          <input type="text" id="modal-name" name="name" placeholder="e.g. Raj Sharma" required />
+          <span class="modal-field-error" id="modal-name-error"></span>
+        </div>
+        <div class="modal-field">
+          <label for="modal-email">Email Address *</label>
+          <input type="email" id="modal-email" name="email" placeholder="you@example.com" required />
+          <span class="modal-field-error" id="modal-email-error"></span>
+        </div>
+      </div>
+
+      <div class="modal-form-row">
+        <div class="modal-field">
+          <label for="modal-phone">Phone Number</label>
+          <input type="tel" id="modal-phone" name="phone" placeholder="+61 or any country" />
+          <span class="modal-field-error" id="modal-phone-error"></span>
+        </div>
+        <div class="modal-field">
+          <label for="modal-business">Business Type *</label>
+          <select id="modal-business" name="business_type" required>
+            <option value="">Select your business...</option>
+            <option value="Restaurant/Cafe">Restaurant / Cafe</option>
+            <option value="Plumber/Electrician">Plumber / Electrician</option>
+            <option value="Hair Salon/Barber">Hair Salon / Barber</option>
+            <option value="Driving School">Driving School</option>
+            <option value="Mechanic">Mechanic Workshop</option>
+            <option value="Retail Shop">Retail Shop</option>
+            <option value="Other">Other</option>
+          </select>
+          <span class="modal-field-error" id="modal-business-error"></span>
+        </div>
+      </div>
+
+      <div class="modal-field">
+        <label for="modal-service">What are you interested in? *</label>
+        <select id="modal-service" name="service_interested" required>
+          <option value="">Pick a service...</option>
+          <option value="Website Design">Website Design</option>
+          <option value="AI Chatbot">AI Chatbot</option>
+          <option value="AI Voice Agent">AI Voice Agent</option>
+          <option value="SMS Automation">SMS Automation</option>
+          <option value="Booking System">Booking System</option>
+          <option value="Full Package">Full Package — Everything</option>
+          <option value="Not Sure Yet">Not Sure Yet — Let's Talk</option>
+        </select>
+        <span class="modal-field-error" id="modal-service-error"></span>
+      </div>
+
+      <div class="modal-field">
+        <label for="modal-message">Tell me about your business</label>
+        <textarea id="modal-message" name="message" rows="3" placeholder="What does your business do? What problems do you want to solve?"></textarea>
+      </div>
+
+      <button type="submit" class="modal-submit-btn" id="modal-submit-btn">
+        <span id="modal-btn-text">Book My Free Consultation →</span>
+      </button>
+
+      <div id="modal-success" class="modal-success-msg" style="display:none;">
+        ✅ Thank you! I will get back to you within 24 hours. — Saujan
+      </div>
+
+      <div id="modal-error" class="modal-error-msg" style="display:none;">
+        ❌ Something went wrong. Please email hello@saujantech.com.au
+      </div>
+
+    </form>
+  </div>
+</div>
+
 </body>
 </html>
