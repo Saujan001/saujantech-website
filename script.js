@@ -712,7 +712,7 @@ async function loadBlogPreview() {
     posts.forEach((post, i) => {
       const card = document.createElement('a');
       card.className = 'blog-preview-card';
-      card.href = `blog/post.html?slug=${post.slug}`;
+      card.href = `/blog/post?slug=${post.slug}`;
 
       const date = new Date(post.created_at).toLocaleDateString('en-AU', {
         day: 'numeric', month: 'long', year: 'numeric'
