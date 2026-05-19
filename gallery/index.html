@@ -942,6 +942,7 @@
     allPhotos.forEach(function (photo, index) {
       const item = document.createElement('div');
       item.className = 'masonry-item';
+      item.setAttribute('data-category', photo.category || 'all');
       item.innerHTML = `
         <img
           src="${photo.url}"
@@ -1036,16 +1037,42 @@
   });
 
   // ================================
-  // FILTER TABS (visual only for now)
-  // NOTE: Wire up real filtering once photos table has a 'category'
-  // column — filter by: supabaseClient.from('photos').eq('category', filter)
+  // FILTER TABS — filters masonry items by data-category attribute
+  // Category values in Supabase photos table: meetings, conferences, community, work
   // ================================
   document.querySelectorAll('.filter-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
+      // Update active button
       document.querySelectorAll('.filter-btn').forEach(function (b) {
         b.classList.remove('active');
       });
       this.classList.add('active');
+
+      const filter = this.getAttribute('data-filter');
+
+      // Show or hide photos
+      document.querySelectorAll('.masonry-item').forEach(function (item) {
+        const category = item.getAttribute('data-category');
+        if (filter === 'all' || category === filter) {
+          item.style.display = 'block';
+          setTimeout(function () {
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+          }, 50);
+        } else {
+          item.style.opacity = '0';
+          item.style.transform = 'translateY(10px)';
+          setTimeout(function () {
+            item.style.display = 'none';
+          }, 300);
+        }
+      });
+
+      // Update photo count
+      const visible = filter === 'all'
+        ? document.querySelectorAll('.masonry-item').length
+        : document.querySelectorAll('.masonry-item[data-category="' + filter + '"]').length;
+      document.getElementById('photo-total-count').textContent = visible + ' photo' + (visible !== 1 ? 's' : '');
     });
   });
 
