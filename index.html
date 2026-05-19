@@ -591,20 +591,180 @@
 
   <!-- PRICING SECTION REMOVED — paste pricing code here if needed in future -->
 
-  <!-- GALLERY PREVIEW SECTION -->
-  <section id="gallery-preview" class="gallery-preview-section">
-    <div class="container">
-      <p class="section-label">MOMENTS &amp; MEMORIES</p>
-      <h2 class="section-heading">Behind the Scenes</h2>
-      <p class="section-subheading">Real people. Real meetings. Real results. A glimpse into the SaujanTech journey.</p>
-      <div class="gallery-preview-grid" id="gallery-preview-grid">
-        <!-- Filled by JavaScript -->
+  <!-- GALLERY CAROUSEL SECTION -->
+  <section id="gallery-preview" class="gal-section">
+    <div class="gal-inner">
+
+      <header class="gal-heading-row">
+        <span class="gal-eyebrow"><span class="gal-dot"></span>Moments &amp; Memories</span>
+        <h2 class="gal-title">Behind the <em>Scenes</em></h2>
+        <p class="gal-subheading">Real people. Real meetings. Real results. A glimpse into the SaujanTech journey.</p>
+      </header>
+
+      <div class="gal-filters" role="tablist" aria-label="Filter photos by category">
+        <button class="gal-tab is-active" data-filter="all" role="tab" aria-selected="true">All Photos <span class="gal-count" id="gal-count-all">5</span></button>
+        <button class="gal-tab" data-filter="clients" role="tab">Client Meetings <span class="gal-count">—</span></button>
+        <button class="gal-tab" data-filter="conferences" role="tab">Conferences <span class="gal-count">—</span></button>
+        <button class="gal-tab" data-filter="community" role="tab">Community <span class="gal-count">—</span></button>
+        <button class="gal-tab" data-filter="sessions" role="tab">Working Sessions <span class="gal-count">—</span></button>
+        <button class="gal-tab gal-view-all" onclick="window.location.href='gallery/index.html'" aria-label="View full gallery">
+          View All
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
       </div>
-      <div class="section-cta">
-        <a href="gallery/index.html" class="btn-outline-cyan">View Full Gallery →</a>
+
+      <div class="gal-carousel-wrap" id="gal-carousel-wrap">
+        <div class="gal-stage" id="gal-stage"></div>
       </div>
+
+      <div class="gal-controls">
+        <button class="gal-arrow-btn" id="gal-prev" aria-label="Previous photo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        </button>
+        <div class="gal-counter" aria-live="polite">
+          <span class="gal-num" id="gal-num-current">01</span>
+          <div class="gal-track"><div class="gal-bar" id="gal-bar"></div></div>
+          <span id="gal-num-total">/ 05</span>
+        </div>
+        <button class="gal-arrow-btn" id="gal-next" aria-label="Next photo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+      <div class="gal-dots" id="gal-dots" role="tablist" aria-label="Jump to photo"></div>
+
     </div>
   </section>
+
+  <script>
+  (function () {
+    var PLACEHOLDERS = [
+      { src: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80', tag: 'Working Sessions', title: 'Strategy whiteboard' },
+      { src: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&q=80', tag: 'Conferences',      title: 'Business Summit' },
+      { src: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=900&q=80', tag: 'Client Meetings',  title: 'Onsite kickoff' },
+      { src: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80', tag: 'Client Meetings',  title: 'Product review' },
+      { src: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80', tag: 'Community',        title: 'Open house meetup' }
+    ];
+
+    var stage    = document.getElementById('gal-stage');
+    var prevBtn  = document.getElementById('gal-prev');
+    var nextBtn  = document.getElementById('gal-next');
+    var dotsBox  = document.getElementById('gal-dots');
+    var numCur   = document.getElementById('gal-num-current');
+    var numTot   = document.getElementById('gal-num-total');
+    var bar      = document.getElementById('gal-bar');
+    var tabs     = document.querySelectorAll('.gal-tab');
+    var current  = 2;
+    var total    = 0;
+
+    function buildCarousel(photos) {
+      stage.innerHTML  = '';
+      dotsBox.innerHTML = '';
+      total = photos.length;
+      numTot.textContent = '/ ' + String(total).padStart(2, '0');
+
+      photos.forEach(function (p, i) {
+        var el = document.createElement('div');
+        el.className    = 'gal-photo';
+        el.dataset.index = i;
+        el.innerHTML =
+          '<img src="' + p.src + '" alt="' + (p.title || '') + '" loading="lazy" />' +
+          '<div class="gal-caption">' +
+            '<span class="gal-tag">' + (p.tag || '') + '</span>' +
+            (p.title ? ' &nbsp;·&nbsp; ' + p.title : '') +
+          '</div>';
+        el.addEventListener('click', function () { goTo(i); });
+        stage.appendChild(el);
+
+        var dot = document.createElement('button');
+        dot.setAttribute('aria-label', 'Show photo ' + (i + 1));
+        dot.addEventListener('click', function () { goTo(i); });
+        dotsBox.appendChild(dot);
+      });
+
+      current = Math.min(current, total - 1);
+      render();
+    }
+
+    function render() {
+      var els  = stage.querySelectorAll('.gal-photo');
+      var dots = dotsBox.querySelectorAll('button');
+      els.forEach(function (el, i) {
+        var d = i - current;
+        if (d >  total / 2) d -= total;
+        if (d < -total / 2) d += total;
+        var cls = 'pos-hidden';
+        if      (d ===  0) cls = 'pos-center';
+        else if (d === -1) cls = 'pos-left';
+        else if (d ===  1) cls = 'pos-right';
+        else if (d === -2) cls = 'pos-far-left';
+        else if (d ===  2) cls = 'pos-far-right';
+        el.className = 'gal-photo ' + cls;
+      });
+      dots.forEach(function (d, i) { d.classList.toggle('is-active', i === current); });
+      numCur.textContent = String(current + 1).padStart(2, '0');
+      bar.style.width = (((current + 1) / total) * 100) + '%';
+    }
+
+    function goTo(i)  { current = ((i % total) + total) % total; render(); }
+    function next()   { goTo(current + 1); }
+    function prev()   { goTo(current - 1); }
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+
+    document.addEventListener('keydown', function (e) {
+      if (!document.getElementById('gal-carousel-wrap')) return;
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft')  prev();
+    });
+
+    var touchX = null;
+    var wrap = document.getElementById('gal-carousel-wrap');
+    wrap.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+    wrap.addEventListener('touchend', function (e) {
+      if (touchX === null) return;
+      var dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); }
+      touchX = null;
+    });
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (tab.classList.contains('gal-view-all')) return;
+        tabs.forEach(function (t) { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+      });
+    });
+
+    // Render placeholders immediately
+    buildCarousel(PLACEHOLDERS);
+
+    // After page load, swap in real Supabase photos if available
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof supabaseClient === 'undefined') return;
+      supabaseClient
+        .from('photos')
+        .select('url, caption, category')
+        .order('display_order', { ascending: true })
+        .limit(12)
+        .then(function (result) {
+          if (result.error || !result.data || result.data.length === 0) return;
+          var photos = result.data.map(function (p) {
+            return {
+              src:   p.url,
+              tag:   p.category || 'Gallery',
+              title: p.caption  || ''
+            };
+          });
+          document.getElementById('gal-count-all').textContent = photos.length;
+          buildCarousel(photos);
+        })
+        .catch(function () {});
+    });
+  })();
+  </script>
 
   <!-- BLOG PREVIEW SECTION -->
   <section id="blog-preview" class="blog-preview-section">
