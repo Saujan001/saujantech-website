@@ -587,3 +587,194 @@ modalForm.addEventListener('submit', async function(e) {
     });
   });
 })();
+
+// ================================
+// GALLERY PREVIEW — Load from Supabase
+// ================================
+
+async function loadGalleryPreview() {
+  const grid = document.getElementById('gallery-preview-grid');
+  if (!grid) return;
+
+  try {
+    const { data: photos, error } = await supabaseClient
+      .from('photos')
+      .select('*')
+      .order('display_order', { ascending: true })
+      .limit(6);
+
+    if (error) throw error;
+
+    grid.innerHTML = '';
+
+    if (!photos || photos.length === 0) {
+      const placeholders = [
+        { icon: '📸', label: 'Client Meeting' },
+        { icon: '🤝', label: 'Business Visit' },
+        { icon: '🎤', label: 'Conference' },
+        { icon: '💻', label: 'Working Session' },
+        { icon: '🏆', label: 'Achievement' },
+        { icon: '🌏', label: 'Community Event' }
+      ];
+      placeholders.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'gallery-preview-item';
+        item.innerHTML = `
+          <div class="gallery-placeholder-box">
+            ${p.icon}
+            <span>${p.label}</span>
+          </div>
+        `;
+        grid.appendChild(item);
+      });
+      return;
+    }
+
+    photos.forEach((photo, index) => {
+      const item = document.createElement('div');
+      item.className = 'gallery-preview-item';
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(20px)';
+      item.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+      item.innerHTML = `
+        <img src="${photo.url}" alt="${photo.caption || 'SaujanTech Gallery'}" loading="lazy" />
+        <div class="gallery-preview-overlay">
+          <span class="gallery-preview-caption">${photo.caption || ''}</span>
+        </div>
+      `;
+      item.addEventListener('click', () => {
+        window.location.href = 'gallery/index.html';
+      });
+      grid.appendChild(item);
+      setTimeout(() => {
+        item.style.opacity = '1';
+        item.style.transform = 'translateY(0)';
+      }, 100 + index * 100);
+    });
+
+  } catch (err) {
+    console.error('Gallery preview error:', err);
+    grid.innerHTML = '<p style="color:#64748B;text-align:center;padding:40px;">Photos coming soon.</p>';
+  }
+}
+
+// ================================
+// BLOG PREVIEW — Load from Supabase
+// ================================
+
+async function loadBlogPreview() {
+  const grid = document.getElementById('blog-preview-grid');
+  if (!grid) return;
+
+  try {
+    const { data: posts, error } = await supabaseClient
+      .from('blog_posts')
+      .select('*')
+      .eq('published', true)
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    if (error) throw error;
+
+    grid.innerHTML = '';
+
+    if (!posts || posts.length === 0) {
+      const placeholders = [
+        { icon: '🤖', title: 'How AI Automation is Changing Business in Sydney', excerpt: 'Discover how smart automation is helping local businesses save time and grow faster.', badge: 'AI AUTOMATION' },
+        { icon: '🌐', title: 'Why Every Nepalese Business Needs a Website in 2026', excerpt: 'If your business is not online in 2026 you are invisible to most of your potential customers.', badge: 'WEB DESIGN' },
+        { icon: '⏰', title: '5 Automations That Save Business Owners 10 Hours a Week', excerpt: 'These five simple automations are not complicated but together they save serious time.', badge: 'PRODUCTIVITY' }
+      ];
+      const variants = ['variant-1', 'variant-2', 'variant-3'];
+      placeholders.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'blog-preview-card';
+        card.innerHTML = `
+          <div class="blog-card-cover-placeholder ${variants[i]}">${p.icon}</div>
+          <div class="blog-card-body">
+            <span class="blog-card-badge">${p.badge}</span>
+            <h3 class="blog-card-title">${p.title}</h3>
+            <p class="blog-card-excerpt">${p.excerpt}</p>
+            <div class="blog-card-meta">
+              <span class="blog-card-date">Coming soon</span>
+              <span class="blog-card-readmore">Read More →</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+        setTimeout(() => card.classList.add('visible'), 200 + i * 150);
+      });
+      return;
+    }
+
+    const variants = ['variant-1', 'variant-2', 'variant-3'];
+    const icons = ['🤖', '🌐', '⏰'];
+
+    posts.forEach((post, i) => {
+      const card = document.createElement('a');
+      card.className = 'blog-preview-card';
+      card.href = `blog/post.html?slug=${post.slug}`;
+
+      const date = new Date(post.created_at).toLocaleDateString('en-AU', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+
+      const wordCount = post.body ? post.body.replace(/<[^>]*>/g, '').split(' ').length : 0;
+      const readTime = Math.max(1, Math.ceil(wordCount / 200));
+
+      const coverHtml = post.cover_image
+        ? `<img class="blog-card-cover" src="${post.cover_image}" alt="${post.title}" loading="lazy" />`
+        : `<div class="blog-card-cover-placeholder ${variants[i % 3]}">${icons[i % 3]}</div>`;
+
+      card.innerHTML = `
+        ${coverHtml}
+        <div class="blog-card-body">
+          <span class="blog-card-badge">AI AUTOMATION</span>
+          <h3 class="blog-card-title">${post.title}</h3>
+          <p class="blog-card-excerpt">${post.excerpt || ''}</p>
+          <div class="blog-card-meta">
+            <span class="blog-card-date">${date} · ${readTime} min read</span>
+            <span class="blog-card-readmore">Read More →</span>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+      setTimeout(() => card.classList.add('visible'), 200 + i * 150);
+    });
+
+  } catch (err) {
+    console.error('Blog preview error:', err);
+    grid.innerHTML = '<p style="color:#64748B;text-align:center;padding:40px;">Posts coming soon.</p>';
+  }
+}
+
+// ================================
+// INTERSECTION OBSERVER FOR BLOG CARDS
+// ================================
+
+function initBlogPreviewAnimation() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const cards = entry.target.querySelectorAll('.blog-preview-card');
+        cards.forEach((card, i) => {
+          setTimeout(() => card.classList.add('visible'), i * 150);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  const blogGrid = document.getElementById('blog-preview-grid');
+  if (blogGrid) observer.observe(blogGrid);
+}
+
+// ================================
+// RUN ON PAGE LOAD
+// ================================
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadGalleryPreview();
+  loadBlogPreview();
+  initBlogPreviewAnimation();
+});
