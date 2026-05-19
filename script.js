@@ -593,6 +593,7 @@ modalForm.addEventListener('submit', async function(e) {
 // ================================
 
 async function loadGalleryPreview() {
+  console.log('Loading gallery preview...');
   const grid = document.getElementById('gallery-preview-grid');
   if (!grid) return;
 
@@ -663,6 +664,7 @@ async function loadGalleryPreview() {
 // ================================
 
 async function loadBlogPreview() {
+  console.log('Loading blog preview...');
   const grid = document.getElementById('blog-preview-grid');
   if (!grid) return;
 
@@ -770,11 +772,65 @@ function initBlogPreviewAnimation() {
 }
 
 // ================================
+// INSERT SAMPLE BLOG POSTS IF EMPTY
+// ================================
+
+async function insertSamplePostsIfEmpty() {
+  try {
+    const { count } = await supabaseClient
+      .from('blog_posts')
+      .select('*', { count: 'exact', head: true });
+
+    if (count > 0) return;
+
+    const samplePosts = [
+      {
+        title: 'How AI Automation is Changing the Game for Small Businesses in Sydney',
+        slug: 'ai-automation-small-businesses-sydney',
+        excerpt: 'Discover how Nepalese and South Asian business owners in Sydney are using AI automation to save time, reduce no-shows and get more customers.',
+        body: '<h2>The Problem Every Small Business Owner Knows</h2><p>You are running your restaurant, your plumbing business, your hair salon. The phone is ringing. Customers are waiting. And somewhere in the middle of all that you are trying to reply to WhatsApp messages, confirm bookings and chase up customers who never came back.</p><h2>What is AI Automation</h2><p>AI automation means setting up systems that do your repetitive tasks automatically. Simple smart systems that run in the background while you focus on your actual work.</p><h2>Ready to See What Automation Can Do</h2><p>Book a free consultation at saujantech.com.au</p>',
+        cover_image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200',
+        image_1: '', image_2: '', image_3: '',
+        published: true, author: 'Saujan'
+      },
+      {
+        title: 'Why Every Nepalese Business in Sydney Needs a Website in 2026',
+        slug: 'nepalese-business-sydney-needs-website-2026',
+        excerpt: 'If your business does not have a proper website in 2026 you are invisible to 90 percent of your potential customers.',
+        body: '<h2>Your Customers Are Searching Online</h2><p>Think about the last time you needed a plumber or restaurant. You searched Google. Your customers do exactly the same thing. If your business does not appear you simply do not exist to them.</p><h2>What a Website Does For You</h2><p>Shows up on Google, works 24 hours a day, takes bookings automatically and builds trust with customers.</p>',
+        cover_image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200',
+        image_1: '', image_2: '', image_3: '',
+        published: true, author: 'Saujan'
+      },
+      {
+        title: '5 Simple Automations That Save Small Business Owners 10 Hours Every Week',
+        slug: '5-automations-save-10-hours-week',
+        excerpt: 'These five simple automations are not complicated or expensive but together they save you 10 or more hours every single week.',
+        body: '<h2>Time is Your Most Valuable Resource</h2><p>As a small business owner you wear every hat. Here are five automations that real Sydney businesses use to get hours back every week.</p><h2>1. Missed Call Auto Reply</h2><p>Instantly SMS anyone who calls and you miss.</p><h2>2. Booking Confirmation</h2><p>Automatic email and SMS when someone books.</p><h2>3. Appointment Reminder</h2><p>SMS reminder 24 hours before reduces no shows by 80 percent.</p><h2>4. Google Review Request</h2><p>Automatic review request after every appointment.</p><h2>5. Re-engagement</h2><p>Automatic message to customers who have not returned in 6 weeks.</p>',
+        cover_image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200',
+        image_1: '', image_2: '', image_3: '',
+        published: true, author: 'Saujan'
+      }
+    ];
+
+    await supabaseClient.from('blog_posts').insert(samplePosts);
+    console.log('Sample posts inserted');
+  } catch (err) {
+    console.error('Sample posts error:', err);
+  }
+}
+
+// ================================
 // RUN ON PAGE LOAD
 // ================================
 
-document.addEventListener('DOMContentLoaded', function() {
-  loadGalleryPreview();
-  loadBlogPreview();
-  initBlogPreviewAnimation();
+document.addEventListener('DOMContentLoaded', async function() {
+  if (document.getElementById('gallery-preview-grid')) {
+    loadGalleryPreview();
+  }
+  if (document.getElementById('blog-preview-grid')) {
+    await insertSamplePostsIfEmpty();
+    loadBlogPreview();
+    initBlogPreviewAnimation();
+  }
 });
