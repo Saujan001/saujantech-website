@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog &amp; Insights — SaujanTech</title>
+  <meta name="description" content="Tips, strategies and real stories about AI automation and growing your business in Sydney.">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #E2E8F0;
+      background: #0A0F2C;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    p { margin: 0; line-height: 1.6; }
+    a { text-decoration: none; }
+    ul { margin: 0; padding: 0; list-style: none; }
+    button { font-family: inherit; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav.scrolled {
+      background: rgba(10,15,44,0.88);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border-color: rgba(30,58,95,0.6);
+    }
+
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nav-bracket {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-link {
+      color: #94A3B8;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover { color: white; background: rgba(255,255,255,0.06); }
+    .nav-link.active { color: #22D3EE; }
+
+    .btn-glow {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      box-shadow: 0 0 18px rgba(6,182,212,0.3);
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .btn-glow:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 70px; left: 0; right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        background: rgba(10,15,44,0.97);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        padding: 20px;
+        gap: 4px;
+        border-bottom: 1px solid rgba(30,58,95,0.4);
+        z-index: 100;
+      }
+      .nav-links.open { display: flex; }
+      .nav-hamburger { display: inline-flex; }
+      .nav-link { font-size: 16px; padding: 10px 0; }
+      .nav-links .btn-glow { text-align: center; justify-content: center; margin-top: 8px; }
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .blog-hero {
+      background: #0A0F2C;
+      padding: 120px 0 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+    }
+
+    .blog-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(37,99,235,0.15) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    .blog-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, #0A0F2C 100%);
+      pointer-events: none;
+    }
+
+    .blog-hero .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(6,182,212,0.1);
+      color: #06B6D4;
+      border: 1px solid rgba(6,182,212,0.3);
+      padding: 6px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 16px;
+      line-height: 1.2;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      color: #64748B;
+      font-size: 16px;
+      max-width: 560px;
+      margin: 0 auto 20px;
+      line-height: 1.7;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .breadcrumb a { color: #06B6D4; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    @media (max-width: 768px) {
+      .hero-title { font-size: 32px; }
+      .blog-hero { padding: 100px 0 50px; }
+    }
+
+    /* ============================================================
+       FEATURED SECTION
+    ============================================================ */
+    .featured-section {
+      background: #060B1A;
+      padding: 60px 0;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #06B6D4;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .featured-loading {
+      text-align: center;
+      padding: 60px;
+      color: #64748B;
+      font-size: 14px;
+    }
+
+    .featured-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: #111827;
+      border: 1px solid #1E3A5F;
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .featured-card:hover {
+      border-color: #06B6D4;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .featured-image {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .featured-image-placeholder {
+      width: 100%;
+      min-height: 360px;
+      background: linear-gradient(135deg, #1E3A5F, #2563EB);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+    }
+
+    .featured-body {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .featured-badge {
+      display: inline-block;
+      background: rgba(6,182,212,0.1);
+      color: #06B6D4;
+      border: 1px solid rgba(6,182,212,0.3);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    .featured-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 16px;
+      line-height: 1.3;
+    }
+
+    .featured-excerpt {
+      color: #64748B;
+      font-size: 15px;
+      line-height: 1.7;
+      margin: 0 0 24px;
+    }
+
+    .featured-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .featured-meta-item {
+      color: #475569;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .featured-read-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      width: fit-content;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .featured-read-btn:hover { opacity: 0.9; transform: translateX(4px); }
+
+    @media (max-width: 768px) {
+      .featured-card { grid-template-columns: 1fr; }
+      .featured-image, .featured-image-placeholder { min-height: 220px; }
+      .featured-body { padding: 28px 24px; }
+      .featured-title { font-size: 22px; }
+    }
+
+    /* ============================================================
+       ALL POSTS GRID
+    ============================================================ */
+    .posts-section {
+      background: #0A0F2C;
+      padding: 60px 0 100px;
+    }
+
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .post-card {
+      background: #111827;
+      border: 1px solid #1E3A5F;
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .post-card.visible { opacity: 1; transform: translateY(0); }
+
+    .post-card:hover {
+      border-color: #06B6D4;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      transform: translateY(-4px);
+    }
+
+    .post-card-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .post-card-placeholder {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+    }
+
+    .post-card-placeholder.v1 { background: linear-gradient(135deg, #1E3A5F, #2563EB); }
+    .post-card-placeholder.v2 { background: linear-gradient(135deg, #0F3460, #06B6D4); }
+    .post-card-placeholder.v3 { background: linear-gradient(135deg, #1A1A2E, #2563EB); }
+
+    .post-card-body { padding: 22px; }
+
+    .post-card-badge {
+      display: inline-block;
+      background: rgba(6,182,212,0.1);
+      color: #06B6D4;
+      border: 1px solid rgba(6,182,212,0.3);
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .post-card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 10px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-card-excerpt {
+      color: #64748B;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #1E3A5F;
+      padding-top: 14px;
+    }
+
+    .post-card-date { color: #475569; font-size: 12px; }
+
+    .post-card-arrow {
+      color: #06B6D4;
+      font-size: 16px;
+      font-weight: bold;
+      transition: transform 0.2s ease;
+    }
+
+    .post-card:hover .post-card-arrow { transform: translateX(4px); }
+
+    .posts-loading { text-align: center; padding: 60px; }
+
+    .posts-empty { text-align: center; padding: 60px 20px; }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #1E3A5F;
+      border-top-color: #06B6D4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1024px) { .posts-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) {
+      .posts-grid { grid-template-columns: 1fr; }
+      .posts-section { padding: 40px 0 60px; }
+    }
+
+    /* ============================================================
+       BACK TO TOP
+    ============================================================ */
+    .back-to-top {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      color: #ffffff;
+      border: none;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .back-to-top.visible { opacity: 1; visibility: visible; }
+    .back-to-top:hover { transform: translateY(-3px); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer-wrap {
+      background: #050810;
+      border-top: 1px solid #1E3A5F;
+      padding: 60px 0 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 14px;
+    }
+
+    .footer-logo-bracket {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .footer-tagline {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 280px;
+      margin-bottom: 20px;
+    }
+
+    .footer-socials { display: flex; gap: 8px; }
+
+    .footer-social-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #64748B;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+
+    .footer-social-btn:hover {
+      background: rgba(6,182,212,0.12);
+      color: #22D3EE;
+      border-color: rgba(6,182,212,0.25);
+    }
+
+    .footer-col-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .footer-link {
+      display: block;
+      color: #475569;
+      font-size: 14px;
+      padding: 5px 0;
+      transition: color 0.15s;
+    }
+
+    .footer-link:hover { color: #22D3EE; }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 28px;
+      border-top: 1px solid #1E3A5F;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .footer-bottom-links a { color: #334155; transition: color 0.15s; }
+    .footer-bottom-links a:hover { color: #64748B; }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">
+      <span class="nav-bracket">&lt;/&gt;</span>
+      <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+    </a>
+
+    <div class="nav-links" id="nav-links">
+      <a href="../index.html#home"       class="nav-link">Home</a>
+      <a href="../index.html#about"      class="nav-link">About</a>
+      <a href="../index.html#services"   class="nav-link">Services</a>
+      <a href="../index.html#portfolio"  class="nav-link">Portfolio</a>
+      <a href="../gallery/index.html"    class="nav-link">Gallery</a>
+      <a href="index.html"              class="nav-link active">Blog</a>
+      <a href="../index.html#contact"    class="nav-link">Contact</a>
+      <a href="../index.html#contact"    class="btn-glow" style="margin-left:6px">Get Free Consultation →</a>
+    </div>
+
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu">&#9776;</button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section class="blog-hero">
+  <div class="container">
+    <span class="hero-badge">✍️ Blog &amp; Insights</span>
+    <h1 class="hero-title">Ideas That Grow Businesses</h1>
+    <p class="hero-subtitle">Tips, strategies and real stories about AI automation, web design and growing your business in Sydney.</p>
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>→</span>
+      <span>Blog</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURED POST
+============================================================ -->
+<section class="featured-section">
+  <div class="container">
+    <p class="section-label">FEATURED POST</p>
+    <div id="featured-post">
+      <div class="featured-loading">Loading...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ALL POSTS GRID
+============================================================ -->
+<section class="posts-section">
+  <div class="container">
+    <p class="section-label">ALL POSTS</p>
+    <div class="posts-grid" id="posts-grid"></div>
+
+    <div id="posts-empty" style="display:none" class="posts-empty">
+      <div style="font-size:50px;margin-bottom:16px;">✍️</div>
+      <h3 style="color:#94A3B8;margin-bottom:8px;font-family:'Space Grotesk',sans-serif;">No posts yet</h3>
+      <p style="color:#64748B;font-size:14px;">Check back soon for insights and tips.</p>
+    </div>
+
+    <div id="posts-loading" class="posts-loading">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BACK TO TOP
+============================================================ -->
+<button id="back-to-top" class="back-to-top" aria-label="Back to top">↑</button>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer class="footer-wrap">
+  <div class="container">
+    <div class="footer-grid">
+
+      <div>
+        <div class="footer-logo">
+          <span class="footer-logo-bracket">&lt;/&gt;</span>
+          <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+        </div>
+        <p class="footer-tagline">Smart websites. Intelligent automation. Real results — for Sydney businesses ready to grow.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-btn">in</a>
+          <a href="#" class="footer-social-btn">ig</a>
+          <a href="https://wa.me/61413736241" class="footer-social-btn" target="_blank" rel="noopener">wa</a>
+          <a href="#" class="footer-social-btn">gh</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Services</div>
+        <a href="../index.html#services" class="footer-link">Website Design</a>
+        <a href="../index.html#services" class="footer-link">AI Chatbots</a>
+        <a href="../index.html#services" class="footer-link">Voice Agents</a>
+        <a href="../index.html#services" class="footer-link">Booking Systems</a>
+        <a href="../index.html#services" class="footer-link">Review Automation</a>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="../index.html#home"      class="footer-link">Home</a>
+        <a href="../index.html#about"     class="footer-link">About</a>
+        <a href="../index.html#portfolio" class="footer-link">Portfolio</a>
+        <a href="../gallery/index.html"   class="footer-link">Gallery</a>
+        <a href="index.html"             class="footer-link">Blog</a>
+        <a href="../index.html#contact"   class="footer-link">Contact</a>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Get in touch</div>
+        <a href="mailto:hello@saujantech.com.au" class="footer-link">📧 hello@saujantech.com.au</a>
+        <a href="https://wa.me/61413736241" class="footer-link" target="_blank" rel="noopener">📱 +61 413 736 241</a>
+        <a href="../index.html#contact" class="footer-link">📍 Sydney, NSW</a>
+        <a href="../index.html#contact" class="footer-link">🕘 Mon–Sat · 9am–8pm AEST</a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 SaujanTech. ABN 62143845320 · All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <span>Built with ⚡ in Sydney</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ================================
+  // SUPABASE SETUP
+  // ================================
+  const SUPABASE_URL = 'https://dmovrefukamczvgnrdcn.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtb3ZyZWZ1a2FtY3p2Z25yZGNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjE3MzUsImV4cCI6MjA5NDI5NzczNX0.loUkLkws_DRSPcC09rwJc7PJAdx8XXbEWi_51jsYF-U';
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ================================
+  // NAVBAR
+  // ================================
+  (function () {
+    var nav = document.getElementById('nav');
+    window.addEventListener('scroll', function () {
+      nav.classList.toggle('scrolled', window.scrollY > 24);
+    }, { passive: true });
+    nav.classList.toggle('scrolled', window.scrollY > 24);
+
+    var btn   = document.getElementById('nav-hamburger');
+    var links = document.getElementById('nav-links');
+    btn.addEventListener('click', function () {
+      var open = links.classList.toggle('open');
+      btn.textContent = open ? '✕' : '☰';
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    links.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        links.classList.remove('open');
+        btn.textContent = '☰';
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+
+  // ================================
+  // BACK TO TOP
+  // ================================
+  (function () {
+    var btn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', function () {
+      btn.classList.toggle('visible', window.scrollY > 300);
+    }, { passive: true });
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  })();
+
+  // ================================
+  // HELPERS
+  // ================================
+  const placeholderPosts = [
+    {
+      title: 'How AI Automation is Changing the Game for Small Businesses in Sydney',
+      slug: 'ai-automation-small-businesses-sydney',
+      excerpt: 'Discover how Nepalese and South Asian business owners in Sydney are using AI automation to save time, reduce no-shows and get more customers.',
+      cover_image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200',
+      created_at: new Date().toISOString(),
+      author: 'Saujan',
+      body: 'placeholder'
+    },
+    {
+      title: 'Why Every Nepalese Business in Sydney Needs a Website in 2026',
+      slug: 'nepalese-business-sydney-needs-website-2026',
+      excerpt: 'If your business does not have a proper website in 2026 you are invisible to 90 percent of your potential customers.',
+      cover_image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200',
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      author: 'Saujan',
+      body: 'placeholder'
+    },
+    {
+      title: '5 Simple Automations That Save Small Business Owners 10 Hours Every Week',
+      slug: '5-automations-save-10-hours-week',
+      excerpt: 'These five simple automations are not complicated or expensive but together they can save you 10 or more hours every single week.',
+      cover_image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200',
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+      author: 'Saujan',
+      body: 'placeholder'
+    }
+  ];
+
+  function formatDate(dateStr) {
+    return new Date(dateStr).toLocaleDateString('en-AU', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+  }
+
+  function getReadTime(body) {
+    if (!body || body === 'placeholder') return 3;
+    const words = body.replace(/<[^>]*>/g, '').split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200));
+  }
+
+  function getVariant(index) {
+    const variants = ['v1', 'v2', 'v3'];
+    const icons    = ['🤖', '🌐', '⏰'];
+    return { variant: variants[index % 3], icon: icons[index % 3] };
+  }
+
+  // ================================
+  // INSERT SAMPLE POSTS (first run only)
+  // ================================
+  async function insertSamplePosts() {
+    try {
+      const { count } = await supabaseClient
+        .from('blog_posts')
+        .select('*', { count: 'exact', head: true });
+      if (count > 0) return;
+
+      const samplePosts = [
+        {
+          title: 'How AI Automation is Changing the Game for Small Businesses in Sydney',
+          slug: 'ai-automation-small-businesses-sydney',
+          excerpt: 'Discover how Nepalese and South Asian business owners in Sydney are using AI automation to save time, reduce no-shows and get more customers — without hiring extra staff.',
+          body: '<h2>The Problem Every Small Business Owner Knows</h2><p>You are running your restaurant, your plumbing business, your hair salon. The phone is ringing. Customers are waiting. And somewhere in the middle of all that — you are trying to reply to WhatsApp messages, confirm bookings and chase up customers who never came back.</p><p>Sound familiar? This is the reality for most small business owners in Sydney. And it is exhausting.</p><h2>What is AI Automation — In Simple Terms</h2><p>AI automation means setting up systems that do your repetitive tasks automatically. Not robots. Not complicated software. Simple, smart systems that run in the background while you focus on your actual work.</p><ul><li>Someone calls your restaurant and you miss it — they instantly get an SMS</li><li>A customer books — they automatically get confirmation and a reminder</li><li>After their visit they get a message asking for a Google review</li><li>Six weeks later if they have not returned — they get a friendly message</li></ul><h2>Real Results From Real Businesses</h2><p>A hair salon in Parramatta reduced no-shows by 70 percent in the first month. A Nepalese restaurant got 15 extra bookings in the first week from missed call auto-reply.</p><h2>Ready to See What Automation Can Do For Your Business?</h2><p>Book a free 30-minute consultation at <a href="https://saujantech.com.au">saujantech.com.au</a></p>',
+          cover_image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200',
+          image_1: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800',
+          image_2: '', image_3: '',
+          published: true, author: 'Saujan'
+        },
+        {
+          title: 'Why Every Nepalese Business in Sydney Needs a Website in 2026',
+          slug: 'nepalese-business-sydney-needs-website-2026',
+          excerpt: 'If your business does not have a proper website in 2026 you are invisible to 90 percent of your potential customers. Here is what you are missing and how to fix it fast.',
+          body: '<h2>Your Customers Are Searching Online — Are You There?</h2><p>Think about the last time you needed a plumber, a restaurant or a hair salon. What did you do first? You searched Google. Your customers do exactly the same thing.</p><p>If your business does not appear in that search — you simply do not exist to them. They click your competitor instead.</p><h2>The Nepalese Business Community in Sydney is Growing</h2><p>Harris Park, Parramatta, Blacktown, Westmead — these areas have dozens of Nepalese-owned businesses. But most rely entirely on word of mouth and Facebook groups. A proper website opens your business to everyone in Sydney.</p><h2>What a Good Website Does For You</h2><ul><li>Shows up on Google when people search for your type of business</li><li>Works 24 hours a day — customers find you at 2am</li><li>Takes bookings automatically</li><li>Builds trust with professional presentation</li><li>Collects Google reviews automatically</li></ul><h2>How Much Does a Website Cost?</h2><p>At SaujanTech websites start from $150 per month — no big upfront cost. That includes the website, hosting, domain and basic automation.</p>',
+          cover_image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200',
+          image_1: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800',
+          image_2: '', image_3: '',
+          published: true, author: 'Saujan'
+        },
+        {
+          title: '5 Simple Automations That Save Small Business Owners 10 Hours Every Week',
+          slug: '5-automations-save-10-hours-week',
+          excerpt: 'These five simple automations are not complicated or expensive. But together they can save you 10 or more hours every single week.',
+          body: '<h2>Time is Your Most Valuable Resource</h2><p>As a small business owner you wear every hat. Here are five automations that real Sydney businesses are using right now to get hours back every week.</p><h2>1. Missed Call Auto-Reply</h2><p>Every missed call is a potential customer lost. Missed call auto-reply sends an instant SMS to anyone whose call you miss. Set it up once and it runs forever.</p><h2>2. Automatic Booking Confirmation</h2><p>Stop manually confirming every booking. Customers instantly receive a professional confirmation email and SMS the moment they book.</p><h2>3. Appointment Reminder</h2><p>An automatic SMS reminder sent 24 hours before every appointment reduces no-shows by up to 80 percent. That is more revenue without any extra work.</p><h2>4. Google Review Request</h2><p>An automatic message sent 2 hours after their appointment makes leaving a review effortless. More reviews means higher Google ranking and more customers.</p><h2>5. Re-engagement Message</h2><p>If a customer has not visited in 6 weeks they get a friendly automatic message to bring them back. Many businesses see 20-30 percent of customers return from this alone.</p><h2>Get These Set Up For Your Business</h2><p>All five automations are included in the SaujanTech Standard package. Book a free consultation at <a href="https://saujantech.com.au">saujantech.com.au</a></p>',
+          cover_image: 'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=1200',
+          image_1: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800',
+          image_2: '', image_3: '',
+          published: true, author: 'Saujan'
+        }
+      ];
+
+      await supabaseClient.from('blog_posts').insert(samplePosts);
+    } catch (err) {
+      console.error('Sample post insert error:', err);
+    }
+  }
+
+  // ================================
+  // FEATURED POST
+  // ================================
+  async function loadFeaturedPost() {
+    const container = document.getElementById('featured-post');
+    try {
+      await insertSamplePosts();
+
+      const { data: posts } = await supabaseClient
+        .from('blog_posts')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      const post = (posts && posts.length > 0) ? posts[0] : placeholderPosts[0];
+      const readTime = getReadTime(post.body);
+      const coverHtml = post.cover_image
+        ? `<img class="featured-image" src="${post.cover_image}" alt="${post.title}" loading="lazy" />`
+        : `<div class="featured-image-placeholder">🤖</div>`;
+
+      container.innerHTML = `
+        <a href="post.html?slug=${post.slug}" class="featured-card">
+          ${coverHtml}
+          <div class="featured-body">
+            <span class="featured-badge">⭐ Featured Post</span>
+            <h2 class="featured-title">${post.title}</h2>
+            <p class="featured-excerpt">${post.excerpt}</p>
+            <div class="featured-meta">
+              <span class="featured-meta-item">✍️ ${post.author || 'Saujan'}</span>
+              <span class="featured-meta-item">📅 ${formatDate(post.created_at)}</span>
+              <span class="featured-meta-item">⏱️ ${readTime} min read</span>
+            </div>
+            <span class="featured-read-btn">Read Full Post →</span>
+          </div>
+        </a>
+      `;
+    } catch (err) {
+      console.error('Featured post error:', err);
+      container.innerHTML = '<p style="color:#64748B;text-align:center;padding:40px;">Could not load featured post.</p>';
+    }
+  }
+
+  // ================================
+  // ALL POSTS
+  // ================================
+  async function loadAllPosts() {
+    const grid    = document.getElementById('posts-grid');
+    const loading = document.getElementById('posts-loading');
+    const empty   = document.getElementById('posts-empty');
+
+    try {
+      const { data: posts } = await supabaseClient
+        .from('blog_posts')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .range(1, 50);
+
+      loading.style.display = 'none';
+
+      const displayPosts = (posts && posts.length > 0) ? posts : placeholderPosts.slice(1);
+
+      if (displayPosts.length === 0) {
+        empty.style.display = 'block';
+        return;
+      }
+
+      grid.innerHTML = '';
+      displayPosts.forEach(function (post, i) {
+        var vInfo    = getVariant(i);
+        var readTime = getReadTime(post.body);
+        var coverHtml = post.cover_image
+          ? `<img class="post-card-image" src="${post.cover_image}" alt="${post.title}" loading="lazy" />`
+          : `<div class="post-card-placeholder ${vInfo.variant}">${vInfo.icon}</div>`;
+
+        var card = document.createElement('a');
+        card.className = 'post-card';
+        card.href = `post.html?slug=${post.slug}`;
+        card.innerHTML = `
+          ${coverHtml}
+          <div class="post-card-body">
+            <span class="post-card-badge">AI &amp; Business</span>
+            <h3 class="post-card-title">${post.title}</h3>
+            <p class="post-card-excerpt">${post.excerpt}</p>
+            <div class="post-card-meta">
+              <span class="post-card-date">${formatDate(post.created_at)} · ${readTime} min read</span>
+              <span class="post-card-arrow">→</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+        setTimeout(function () { card.classList.add('visible'); }, 100 + i * 120);
+      });
+
+    } catch (err) {
+      console.error('Posts error:', err);
+      loading.style.display = 'none';
+    }
+  }
+
+  // ================================
+  // INIT
+  // ================================
+  document.addEventListener('DOMContentLoaded', function () {
+    loadFeaturedPost();
+    loadAllPosts();
+  });
+</script>
+
+</body>
+</html>
