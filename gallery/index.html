@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gallery — SaujanTech</title>
+  <meta name="description" content="Behind the scenes at SaujanTech — real moments from client meetings, conferences, community events and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ============================================================
+       RESET & ROOT
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #E2E8F0;
+      background: #060B1A;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+      margin: 0;
+      line-height: 1.1;
+    }
+    p { margin: 0; line-height: 1.6; }
+    a { text-decoration: none; }
+    ul { margin: 0; padding: 0; list-style: none; }
+    button { font-family: inherit; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav.scrolled {
+      background: rgba(10, 15, 44, 0.88);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border-color: rgba(30, 58, 95, 0.6);
+    }
+
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .nav-bracket {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .nav-link {
+      color: #94A3B8;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover { color: white; background: rgba(255,255,255,0.06); }
+    .nav-link.active { color: #22D3EE; }
+
+    .btn-glow {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      box-shadow: 0 0 18px rgba(6,182,212,0.3);
+      transition: opacity 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .btn-glow:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 70px;
+        left: 0; right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        background: rgba(10,15,44,0.97);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        padding: 20px;
+        gap: 4px;
+        border-bottom: 1px solid rgba(30,58,95,0.4);
+        z-index: 100;
+      }
+      .nav-links.open { display: flex; }
+      .nav-hamburger { display: inline-flex; }
+      .nav-link { font-size: 16px; padding: 10px 0; }
+      .nav-links .btn-glow { text-align: center; justify-content: center; margin-top: 8px; }
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .gallery-hero {
+      background: #0A0F2C;
+      padding: 130px 0 70px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(37,99,235,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(6,182,212,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-dot-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(6,182,212,0.15) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(6,182,212,0.1);
+      border: 1px solid rgba(6,182,212,0.25);
+      color: #22D3EE;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 22px;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      color: #64748B;
+      font-size: 16px;
+      max-width: 560px;
+      margin: 0 auto 28px;
+      line-height: 1.65;
+    }
+
+    .hero-breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .hero-breadcrumb a { color: #64748B; transition: color 0.15s; }
+    .hero-breadcrumb a:hover { color: #22D3EE; }
+    .hero-breadcrumb span { color: #22D3EE; font-weight: 600; }
+
+    /* ============================================================
+       FILTER TABS
+    ============================================================ */
+    .gallery-filters {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 32px 20px;
+      background: #060B1A;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1.5px solid #1E3A5F;
+      color: #64748B;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    /* ============================================================
+       PHOTO COUNT BAR
+    ============================================================ */
+    .photo-count-bar {
+      text-align: center;
+      padding: 12px 20px;
+      background: #060B1A;
+      color: #475569;
+      font-size: 13px;
+      border-bottom: 1px solid #1E3A5F;
+    }
+
+    .count-divider {
+      margin: 0 8px;
+      color: #1E3A5F;
+    }
+
+    /* ============================================================
+       MASONRY GRID
+    ============================================================ */
+    .gallery-main {
+      background: #060B1A;
+      padding: 40px 0 80px;
+      min-height: 400px;
+    }
+
+    .masonry-grid {
+      column-count: 3;
+      column-gap: 16px;
+    }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      background: #111827;
+      border: 1px solid #1E3A5F;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .masonry-item.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .masonry-item:hover {
+      box-shadow: 0 8px 32px rgba(6,182,212,0.2);
+      border-color: #06B6D4;
+    }
+
+    .masonry-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .masonry-item:hover img {
+      transform: scale(1.04);
+    }
+
+    .masonry-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,15,44,0.9) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px;
+    }
+
+    .masonry-item:hover .masonry-overlay {
+      opacity: 1;
+    }
+
+    .masonry-caption {
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .masonry-zoom {
+      color: #06B6D4;
+      font-size: 12px;
+    }
+
+    /* Loading spinner */
+    .gallery-loading-spinner {
+      text-align: center;
+      padding: 60px;
+      color: #64748B;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #1E3A5F;
+      border-top-color: #06B6D4;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .gallery-empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: #64748B;
+    }
+
+    .gallery-empty .empty-icon {
+      font-size: 60px;
+      margin-bottom: 16px;
+    }
+
+    .gallery-empty h3 {
+      color: #94A3B8;
+      font-size: 20px;
+      margin-bottom: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .gallery-empty p {
+      font-size: 14px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1024px) {
+      .masonry-grid { column-count: 2; }
+    }
+
+    @media (max-width: 640px) {
+      .masonry-grid { column-count: 1; column-gap: 0; }
+      .masonry-item { margin-bottom: 12px; }
+    }
+
+    /* ============================================================
+       LIGHTBOX
+    ============================================================ */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .lightbox-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .lightbox-content {
+      position: relative;
+      z-index: 1;
+      max-width: 90vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #lightbox-img {
+      max-width: 90vw;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+      transition: opacity 0.2s ease;
+    }
+
+    .lightbox-caption {
+      color: #94A3B8;
+      font-size: 14px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .lightbox-counter {
+      color: #475569;
+      font-size: 12px;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #ffffff;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-close:hover {
+      background: #EF4444;
+      transform: rotate(90deg);
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #ffffff;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 28px;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+      background: rgba(37,99,235,0.6);
+    }
+
+    @media (max-width: 640px) {
+      .lightbox-prev { left: 8px; }
+      .lightbox-next { right: 8px; }
+      .lightbox-prev, .lightbox-next { width: 40px; height: 40px; font-size: 22px; }
+    }
+
+    /* ============================================================
+       BACK TO TOP
+    ============================================================ */
+    .back-to-top {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      color: #ffffff;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .back-to-top.visible { opacity: 1; visibility: visible; }
+    .back-to-top:hover { transform: translateY(-3px); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer-wrap {
+      background: #050810;
+      border-top: 1px solid #1E3A5F;
+      padding: 60px 0 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 14px;
+    }
+
+    .footer-logo-bracket {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .footer-tagline {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 280px;
+      margin-bottom: 20px;
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 8px;
+    }
+
+    .footer-social-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #64748B;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+
+    .footer-social-btn:hover { background: rgba(6,182,212,0.12); color: #22D3EE; border-color: rgba(6,182,212,0.25); }
+
+    .footer-col-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .footer-link {
+      display: block;
+      color: #475569;
+      font-size: 14px;
+      padding: 5px 0;
+      transition: color 0.15s;
+    }
+
+    .footer-link:hover { color: #22D3EE; }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 28px;
+      border-top: 1px solid #1E3A5F;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .footer-bottom-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .footer-bottom-links a { color: #334155; transition: color 0.15s; }
+    .footer-bottom-links a:hover { color: #64748B; }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; text-align: center; gap: 12px; }
+      .gallery-filters { gap: 8px; }
+      .filter-btn { padding: 7px 14px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo">
+      <span class="nav-bracket">&lt;/&gt;</span>
+      <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+    </a>
+
+    <div class="nav-links" id="nav-links">
+      <a href="../index.html#home"      class="nav-link">Home</a>
+      <a href="../index.html#about"     class="nav-link">About</a>
+      <a href="../index.html#services"  class="nav-link">Services</a>
+      <a href="../index.html#portfolio" class="nav-link">Portfolio</a>
+      <a href="index.html"             class="nav-link active">Gallery</a>
+      <a href="../blog/index.html"      class="nav-link">Blog</a>
+      <a href="../index.html#contact"   class="nav-link">Contact</a>
+      <a href="../index.html#contact"   class="btn-glow" style="margin-left:6px">Get Free Consultation →</a>
+    </div>
+
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu">&#9776;</button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section class="gallery-hero">
+  <div class="hero-dot-grid"></div>
+  <div class="hero-content container">
+    <div class="hero-badge">📸 Photo Gallery</div>
+    <h1 class="hero-title">Behind the Scenes</h1>
+    <p class="hero-sub">Real moments from the SaujanTech journey — client meetings, conferences, community events and everything in between.</p>
+    <div class="hero-breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>›</span>
+      <span>Gallery</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FILTER TABS
+     NOTE: Visual only — real filtering by category can be added
+     later once photos table includes a 'category' column.
+============================================================ -->
+<div class="gallery-filters">
+  <button class="filter-btn active" data-filter="all">All Photos</button>
+  <button class="filter-btn" data-filter="meetings">Client Meetings</button>
+  <button class="filter-btn" data-filter="conferences">Conferences</button>
+  <button class="filter-btn" data-filter="community">Community</button>
+  <button class="filter-btn" data-filter="work">Working Sessions</button>
+</div>
+
+<!-- ============================================================
+     PHOTO COUNT BAR
+============================================================ -->
+<div class="photo-count-bar">
+  <span id="photo-total-count">Loading...</span>
+  <span class="count-divider">·</span>
+  <span>Click any photo to view full size</span>
+</div>
+
+<!-- ============================================================
+     MASONRY PHOTO GRID
+============================================================ -->
+<section class="gallery-main">
+  <div class="container">
+    <div class="masonry-grid" id="masonry-grid"></div>
+
+    <div id="gallery-empty" style="display:none" class="gallery-empty">
+      <div class="empty-icon">📷</div>
+      <h3>Photos Coming Soon</h3>
+      <p>Check back soon to see moments from the SaujanTech journey.</p>
+    </div>
+
+    <div id="gallery-loading" class="gallery-loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading photos...</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIGHTBOX
+============================================================ -->
+<div id="lightbox" class="lightbox" aria-hidden="true">
+  <div class="lightbox-overlay"></div>
+  <button class="lightbox-close" id="lightbox-close" aria-label="Close">✕</button>
+  <button class="lightbox-prev" id="lightbox-prev" aria-label="Previous">‹</button>
+  <button class="lightbox-next" id="lightbox-next" aria-label="Next">›</button>
+  <div class="lightbox-content">
+    <img id="lightbox-img" src="" alt="" />
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     BACK TO TOP
+============================================================ -->
+<button id="back-to-top" class="back-to-top" aria-label="Back to top">↑</button>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer class="footer-wrap">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Brand -->
+      <div>
+        <div class="footer-logo">
+          <span class="footer-logo-bracket">&lt;/&gt;</span>
+          <span>Sauj<span style="color:#22D3EE">a</span>nTech</span>
+        </div>
+        <p class="footer-tagline">
+          Smart websites. Intelligent automation. Real results — for Sydney businesses ready to grow.
+        </p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-btn">in</a>
+          <a href="#" class="footer-social-btn">ig</a>
+          <a href="https://wa.me/61413736241" class="footer-social-btn" target="_blank" rel="noopener">wa</a>
+          <a href="#" class="footer-social-btn">gh</a>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <div>
+        <div class="footer-col-title">Services</div>
+        <a href="../index.html#services" class="footer-link">Website Design</a>
+        <a href="../index.html#services" class="footer-link">AI Chatbots</a>
+        <a href="../index.html#services" class="footer-link">Voice Agents</a>
+        <a href="../index.html#services" class="footer-link">Booking Systems</a>
+        <a href="../index.html#services" class="footer-link">Review Automation</a>
+      </div>
+
+      <!-- Company -->
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="../index.html#home"      class="footer-link">Home</a>
+        <a href="../index.html#about"     class="footer-link">About</a>
+        <a href="../index.html#portfolio" class="footer-link">Portfolio</a>
+        <a href="index.html"             class="footer-link">Gallery</a>
+        <a href="../blog/index.html"      class="footer-link">Blog</a>
+        <a href="../index.html#contact"   class="footer-link">Contact</a>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <div class="footer-col-title">Get in touch</div>
+        <a href="mailto:hello@saujantech.com.au" class="footer-link">📧 hello@saujantech.com.au</a>
+        <a href="https://wa.me/61413736241" class="footer-link" target="_blank" rel="noopener">📱 +61 413 736 241</a>
+        <a href="../index.html#contact" class="footer-link">📍 Sydney, NSW</a>
+        <a href="../index.html#contact" class="footer-link">🕘 Mon–Sat · 9am–8pm AEST</a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 SaujanTech. ABN 62143845320 · All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <span>Built with ⚡ in Sydney</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ================================
+  // SUPABASE SETUP
+  // ================================
+  const SUPABASE_URL = 'https://dmovrefukamczvgnrdcn.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtb3ZyZWZ1a2FtY3p2Z25yZGNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MjE3MzUsImV4cCI6MjA5NDI5NzczNX0.loUkLkws_DRSPcC09rwJc7PJAdx8XXbEWi_51jsYF-U';
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ================================
+  // NAVBAR: scroll glass effect + hamburger
+  // ================================
+  (function () {
+    var nav = document.getElementById('nav');
+    window.addEventListener('scroll', function () {
+      nav.classList.toggle('scrolled', window.scrollY > 24);
+    }, { passive: true });
+    nav.classList.toggle('scrolled', window.scrollY > 24);
+
+    var btn   = document.getElementById('nav-hamburger');
+    var links = document.getElementById('nav-links');
+    btn.addEventListener('click', function () {
+      var open = links.classList.toggle('open');
+      btn.textContent = open ? '✕' : '☰';
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    links.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        links.classList.remove('open');
+        btn.textContent = '☰';
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+
+  // ================================
+  // PLACEHOLDER PHOTOS (shown when Supabase has no photos)
+  // ================================
+  const placeholderPhotos = [
+    { url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600', caption: 'Business Meeting' },
+    { url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600', caption: 'Conference Session' },
+    { url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600', caption: 'Team Workshop' },
+    { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600', caption: 'Strategy Meeting' },
+    { url: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600', caption: 'Networking Event' },
+    { url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600', caption: 'Client Visit' },
+    { url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600', caption: 'Community Meetup' },
+    { url: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600', caption: 'Tech Conference' },
+    { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600', caption: 'Professional Session' },
+    { url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600', caption: 'Working Together' },
+    { url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600', caption: 'Business Discussion' },
+    { url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600', caption: 'Community Event' }
+  ];
+
+  // ================================
+  // LOAD PHOTOS
+  // ================================
+  let allPhotos = [];
+  let currentIndex = 0;
+
+  async function loadGallery() {
+    const grid     = document.getElementById('masonry-grid');
+    const loading  = document.getElementById('gallery-loading');
+    const empty    = document.getElementById('gallery-empty');
+    const countEl  = document.getElementById('photo-total-count');
+
+    try {
+      const { data: photos, error } = await supabaseClient
+        .from('photos')
+        .select('*')
+        .order('display_order', { ascending: true });
+
+      if (error) throw error;
+
+      allPhotos = (photos && photos.length > 0) ? photos : placeholderPhotos;
+
+    } catch (err) {
+      console.error('Gallery load error:', err);
+      allPhotos = placeholderPhotos;
+    }
+
+    loading.style.display = 'none';
+
+    if (allPhotos.length === 0) {
+      empty.style.display = 'block';
+      countEl.textContent = '0 photos';
+      return;
+    }
+
+    countEl.textContent = `${allPhotos.length} photo${allPhotos.length !== 1 ? 's' : ''}`;
+    grid.innerHTML = '';
+
+    allPhotos.forEach(function (photo, index) {
+      const item = document.createElement('div');
+      item.className = 'masonry-item';
+      item.innerHTML = `
+        <img
+          src="${photo.url}"
+          alt="${photo.caption || 'SaujanTech Gallery Photo'}"
+          loading="lazy"
+          onload="this.closest('.masonry-item').classList.add('loaded')"
+        />
+        <div class="masonry-overlay">
+          <span class="masonry-caption">${photo.caption || ''}</span>
+          <span class="masonry-zoom">🔍 Click to view</span>
+        </div>
+      `;
+      item.addEventListener('click', function () { openLightbox(index); });
+      grid.appendChild(item);
+
+      // Staggered fade-in
+      setTimeout(function () { item.classList.add('loaded'); }, index * 80);
+    });
+  }
+
+  // ================================
+  // LIGHTBOX
+  // ================================
+  function openLightbox(index) {
+    currentIndex = index;
+    updateLightbox();
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('active');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    lb.classList.remove('active');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function updateLightbox() {
+    const photo   = allPhotos[currentIndex];
+    const img     = document.getElementById('lightbox-img');
+    img.style.opacity = '0';
+    setTimeout(function () {
+      img.src = photo.url;
+      img.alt = photo.caption || '';
+      document.getElementById('lightbox-caption').textContent = photo.caption || '';
+      document.getElementById('lightbox-counter').textContent = `${currentIndex + 1} / ${allPhotos.length}`;
+      img.style.opacity = '1';
+    }, 150);
+  }
+
+  function prevPhoto() {
+    currentIndex = (currentIndex - 1 + allPhotos.length) % allPhotos.length;
+    updateLightbox();
+  }
+
+  function nextPhoto() {
+    currentIndex = (currentIndex + 1) % allPhotos.length;
+    updateLightbox();
+  }
+
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox-prev').addEventListener('click', prevPhoto);
+  document.getElementById('lightbox-next').addEventListener('click', nextPhoto);
+
+  document.getElementById('lightbox').addEventListener('click', function (e) {
+    if (e.target === this || e.target.classList.contains('lightbox-overlay')) {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    const lb = document.getElementById('lightbox');
+    if (!lb.classList.contains('active')) return;
+    if (e.key === 'Escape')      closeLightbox();
+    if (e.key === 'ArrowLeft')   prevPhoto();
+    if (e.key === 'ArrowRight')  nextPhoto();
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  document.getElementById('lightbox').addEventListener('touchstart', function (e) {
+    touchStartX = e.touches[0].clientX;
+  });
+  document.getElementById('lightbox').addEventListener('touchend', function (e) {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextPhoto();
+      else prevPhoto();
+    }
+  });
+
+  // ================================
+  // FILTER TABS (visual only for now)
+  // NOTE: Wire up real filtering once photos table has a 'category'
+  // column — filter by: supabaseClient.from('photos').eq('category', filter)
+  // ================================
+  document.querySelectorAll('.filter-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+      });
+      this.classList.add('active');
+    });
+  });
+
+  // ================================
+  // BACK TO TOP
+  // ================================
+  const backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', function () {
+    backToTop.classList.toggle('visible', window.scrollY > 300);
+  }, { passive: true });
+  backToTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ================================
+  // INIT
+  // ================================
+  document.addEventListener('DOMContentLoaded', loadGallery);
+</script>
+
+</body>
+</html>
