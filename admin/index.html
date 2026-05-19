@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SaujanTech — Inquiries Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <style>
     /* ============================================================
        SAUJANTECH ADMIN DASHBOARD — styles
@@ -872,6 +874,605 @@
     html[data-theme="light"] .modal-msg-box       { background: #F5F7FF; border-color: #DDE5FF; color: #1B2342; }
     html[data-theme="light"] .btn-modal-close     { background: #F0F4FF; border-color: #D1DCF9; color: #6B7390; }
     html[data-theme="light"] .btn-modal-close:hover { background: #DDE5FF; color: #0B1020; }
+
+    /* ============================================================
+       ADMIN TABS
+       ============================================================ */
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #1E3A5F;
+      padding-bottom: 0;
+      flex-wrap: wrap;
+    }
+
+    .admin-tab {
+      background: transparent;
+      border: none;
+      color: #64748B;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .admin-tab:hover { color: #94A3B8; }
+
+    .admin-tab.active {
+      color: #06B6D4;
+      border-bottom-color: #06B6D4;
+    }
+
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    /* ============================================================
+       PANEL HEADER (shared)
+       ============================================================ */
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      color: #06B6D4;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+
+    .panel-subtitle {
+      color: #64748B;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    /* ============================================================
+       GALLERY PANEL
+       ============================================================ */
+    .photo-counter {
+      background: #0A0F2C;
+      border: 1px solid #1E3A5F;
+      border-radius: 999px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    #photo-count-number {
+      color: #06B6D4;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .photo-counter-label { color: #64748B; font-size: 13px; }
+
+    .upload-zone {
+      border: 2px dashed #1E3A5F;
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.3s ease, background 0.3s ease;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-active {
+      border-color: #06B6D4;
+      background: rgba(6,182,212,0.03);
+    }
+
+    .upload-zone-icon  { font-size: 44px; margin-bottom: 12px; }
+    .upload-zone-title { color: #ffffff; font-size: 16px; font-weight: 600; margin: 0 0 6px; }
+    .upload-zone-sub   { color: #64748B; font-size: 13px; margin: 0 0 6px; }
+    .upload-zone-rules { color: #475569; font-size: 12px; margin: 0 0 20px; }
+
+    .btn-upload-trigger {
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      color: #ffffff;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-upload-trigger:hover { opacity: 0.85; }
+
+    .upload-error-list {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .upload-error-item {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #FCA5A5;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .upload-progress-wrap {
+      margin-bottom: 16px;
+      background: #0A0F2C;
+      border: 1px solid #1E3A5F;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .progress-track {
+      background: #1E3A5F;
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2563EB, #06B6D4);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .progress-label { color: #64748B; font-size: 13px; text-align: center; margin: 0; }
+
+    .upload-success-msg {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: #10B981;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .admin-gallery-header { margin-top: 32px; margin-bottom: 16px; }
+    .admin-gallery-heading { color: #ffffff; font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+    .admin-gallery-hint    { color: #475569; font-size: 12px; margin: 0; }
+
+    .admin-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .admin-photo-item {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: #0A0F2C;
+      border: 1px solid #1E3A5F;
+      transition: border-color 0.2s ease;
+    }
+    .admin-photo-item:hover { border-color: #2563EB; }
+    .admin-photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .admin-photo-actions {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      padding: 8px;
+    }
+    .admin-photo-item:hover .admin-photo-actions { opacity: 1; }
+
+    .admin-photo-caption-text {
+      color: #ffffff;
+      font-size: 11px;
+      text-align: center;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 8px;
+    }
+
+    .btn-edit-caption {
+      background: #2563EB;
+      color: #fff;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .btn-edit-caption:hover { background: #1D4ED8; }
+
+    .btn-delete-photo {
+      background: rgba(239,68,68,0.9);
+      color: #fff;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      transition: background 0.2s;
+    }
+    .btn-delete-photo:hover { background: #DC2626; }
+
+    .admin-loading {
+      grid-column: 1/-1;
+      text-align: center;
+      color: #64748B;
+      padding: 40px;
+      font-size: 14px;
+    }
+
+    .admin-empty {
+      grid-column: 1/-1;
+      text-align: center;
+      color: #64748B;
+      padding: 40px;
+      font-size: 14px;
+    }
+
+    /* ============================================================
+       BLOG PANEL
+       ============================================================ */
+    .btn-new-post {
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-new-post:hover { opacity: 0.85; }
+
+    .blog-post-row {
+      background: #0A0F2C;
+      border: 1px solid #1E3A5F;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s ease;
+      flex-wrap: wrap;
+    }
+    .blog-post-row:hover { border-color: #2563EB; }
+
+    .blog-row-info { flex: 1; min-width: 0; }
+
+    .blog-row-title {
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .blog-row-meta {
+      color: #475569;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .status-published { background: rgba(16,185,129,0.1); color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
+    .status-draft     { background: rgba(100,116,139,0.1); color: #64748B; border: 1px solid rgba(100,116,139,0.3); }
+
+    .blog-row-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+    .btn-edit-post {
+      background: #1E3A5F;
+      color: #06B6D4;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .btn-edit-post:hover { background: #2563EB; color: #fff; }
+
+    .btn-toggle-publish {
+      background: transparent;
+      border: 1px solid #1E3A5F;
+      color: #64748B;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .btn-toggle-publish:hover { border-color: #10B981; color: #10B981; }
+
+    /* Editor */
+    .editor-top-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #1E3A5F;
+      flex-wrap: wrap;
+    }
+
+    .btn-back-list {
+      background: transparent;
+      border: 1px solid #1E3A5F;
+      color: #64748B;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+    .btn-back-list:hover { border-color: #06B6D4; color: #06B6D4; }
+
+    .editor-view-title { color: #ffffff; font-size: 18px; font-weight: 600; margin: 0; flex: 1; }
+
+    .editor-top-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+    .editor-message {
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .editor-message.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #10B981; }
+    .editor-message.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #FCA5A5; }
+
+    .editor-field { margin-bottom: 24px; }
+
+    .editor-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #94A3B8;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .char-count { color: #475569; font-size: 12px; font-weight: 400; }
+
+    .editor-input {
+      width: 100%;
+      background: #0A0F2C;
+      border: 1.5px solid #1E3A5F;
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+      box-sizing: border-box;
+    }
+    .editor-input:focus { border-color: #2563EB; }
+
+    .editor-textarea {
+      width: 100%;
+      background: #0A0F2C;
+      border: 1.5px solid #1E3A5F;
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s ease;
+      box-sizing: border-box;
+    }
+    .editor-textarea:focus { border-color: #2563EB; }
+
+    .editor-file-input {
+      background: #0A0F2C;
+      border: 1px solid #1E3A5F;
+      border-radius: 6px;
+      padding: 8px;
+      color: #94A3B8;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .field-note { color: #475569; font-size: 11px; margin: 4px 0 0; }
+
+    .cover-image-options {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .cover-option-label { color: #64748B; font-size: 12px; margin: 0 0 8px; font-weight: 500; }
+
+    .cover-option-divider { color: #334155; font-size: 12px; font-weight: 600; text-align: center; padding: 0 8px; }
+
+    .cover-preview-wrap { position: relative; display: inline-block; margin-top: 8px; }
+
+    .cover-preview-img {
+      max-width: 280px;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #1E3A5F;
+      display: block;
+    }
+
+    .btn-remove-cover {
+      position: absolute;
+      top: -8px; right: -8px;
+      background: #EF4444;
+      color: #fff;
+      border: none;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #quill-editor-wrap { border-radius: 8px; overflow: hidden; }
+
+    .ql-toolbar.ql-snow  { background: #111827 !important; border-color: #1E3A5F !important; border-bottom-color: #0A0F2C !important; }
+    .ql-container.ql-snow { background: #0A0F2C !important; border-color: #1E3A5F !important; color: #ffffff !important; font-family: inherit !important; font-size: 14px !important; min-height: 280px; }
+    .ql-editor { color: #ffffff !important; min-height: 280px; line-height: 1.7; }
+    .ql-editor.ql-blank::before { color: #334155 !important; font-style: normal !important; }
+    .ql-toolbar .ql-stroke { stroke: #94A3B8 !important; }
+    .ql-toolbar .ql-fill  { fill:  #94A3B8 !important; }
+    .ql-toolbar .ql-picker-label { color: #94A3B8 !important; }
+    .ql-toolbar button:hover .ql-stroke, .ql-toolbar .ql-active .ql-stroke { stroke: #06B6D4 !important; }
+    .ql-toolbar button:hover .ql-fill,   .ql-toolbar .ql-active .ql-fill   { fill:  #06B6D4 !important; }
+    .ql-toolbar .ql-picker-label:hover, .ql-toolbar .ql-active.ql-picker-label { color: #06B6D4 !important; }
+
+    .extra-images-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+
+    .extra-image-item {
+      background: #0A0F2C;
+      border: 1px solid #1E3A5F;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .extra-img-label {
+      color: #64748B;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .extra-img-preview { margin-top: 8px; position: relative; display: inline-block; }
+    .extra-img-preview img { max-width: 100%; max-height: 100px; border-radius: 6px; object-fit: cover; display: block; border: 1px solid #1E3A5F; }
+    .extra-img-preview button {
+      position: absolute; top: -6px; right: -6px;
+      background: #EF4444; color: #fff; border: none;
+      width: 20px; height: 20px; border-radius: 50%;
+      font-size: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .editor-bottom-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #1E3A5F;
+    }
+
+    .btn-save-draft {
+      background: #1E3A5F;
+      color: #94A3B8;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .btn-save-draft:hover { background: #2D4A7A; }
+
+    .btn-publish-post {
+      background: linear-gradient(135deg, #2563EB, #06B6D4);
+      color: #ffffff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: inherit;
+    }
+    .btn-publish-post:hover { opacity: 0.85; }
+
+    .btn-delete-post {
+      background: rgba(239,68,68,0.1);
+      color: #EF4444;
+      border: 1px solid rgba(239,68,68,0.3);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: auto;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .btn-delete-post:hover { background: rgba(239,68,68,0.2); }
+
+    @media (max-width: 768px) {
+      .admin-photo-grid { grid-template-columns: repeat(2,1fr); }
+      .upload-zone { padding: 32px 16px; }
+      .cover-image-options { grid-template-columns: 1fr; }
+      .cover-option-divider { display: none; }
+      .extra-images-grid { grid-template-columns: 1fr; }
+      .editor-top-bar { flex-direction: column; align-items: flex-start; }
+      .editor-top-actions { width: 100%; }
+      .editor-bottom-actions { flex-direction: column; }
+      .btn-delete-post { margin-left: 0; }
+    }
   </style>
 </head>
 <body>
@@ -940,6 +1541,16 @@
 
     <!-- Main content -->
     <main class="dash-main">
+
+      <!-- ADMIN TABS -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="enquiries">📬 Enquiries</button>
+        <button class="admin-tab" data-tab="gallery">📸 Gallery</button>
+        <button class="admin-tab" data-tab="blog">✍️ Blog Posts</button>
+      </div>
+
+      <!-- ENQUIRIES PANEL -->
+      <div id="panel-enquiries" class="admin-panel active">
 
       <div class="page-heading">
         <h2 class="page-title">SaujanTech — Inquiries Dashboard</h2>
@@ -1018,6 +1629,174 @@
         </div>
 
       </div>
+
+      </div><!-- end panel-enquiries -->
+
+      <!-- ============================================================
+           GALLERY PANEL
+           ============================================================ -->
+      <div id="panel-gallery" class="admin-panel">
+
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">📸 Photo Gallery</h2>
+            <p class="panel-subtitle">Upload and manage photos shown in your gallery. Maximum 25 photos, 2MB each.</p>
+          </div>
+          <div class="photo-counter">
+            <span id="photo-count-number">0</span>
+            <span class="photo-counter-label">/ 25 photos</span>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-zone-icon">📷</div>
+          <p class="upload-zone-title">Drag &amp; drop photos here</p>
+          <p class="upload-zone-sub">or click to browse from your computer</p>
+          <p class="upload-zone-rules">JPG · PNG · WebP · Max 2MB per photo · Max 25 photos total</p>
+          <input type="file" id="photo-file-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none" />
+          <button class="btn-upload-trigger" onclick="document.getElementById('photo-file-input').click()">Choose Photos</button>
+        </div>
+
+        <div id="upload-error-list" class="upload-error-list" style="display:none"></div>
+
+        <div id="upload-progress-wrap" class="upload-progress-wrap" style="display:none">
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <p class="progress-label" id="progress-label">Uploading...</p>
+        </div>
+
+        <div id="upload-success" class="upload-success-msg" style="display:none">✅ Photos uploaded successfully!</div>
+
+        <div class="admin-gallery-header">
+          <h3 class="admin-gallery-heading">Your Photos</h3>
+          <p class="admin-gallery-hint">Hover over a photo to edit caption or delete it.</p>
+        </div>
+        <div class="admin-photo-grid" id="admin-photo-grid">
+          <div class="admin-loading">Loading photos...</div>
+        </div>
+
+      </div><!-- end panel-gallery -->
+
+      <!-- ============================================================
+           BLOG PANEL
+           ============================================================ -->
+      <div id="panel-blog" class="admin-panel">
+
+        <!-- Post list view -->
+        <div id="blog-list-view">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">✍️ Blog Posts</h2>
+              <p class="panel-subtitle">Create and manage your blog posts. Published posts appear on your website immediately.</p>
+            </div>
+            <button class="btn-new-post" id="btn-new-post">+ New Post</button>
+          </div>
+          <div id="blog-post-list">
+            <div style="color:#64748B;padding:20px;text-align:center;font-size:14px;">Loading posts...</div>
+          </div>
+        </div>
+
+        <!-- Post editor view (hidden by default) -->
+        <div id="blog-editor-view" style="display:none">
+
+          <div class="editor-top-bar">
+            <button class="btn-back-list" id="btn-back-list">← Back to Posts</button>
+            <h3 class="editor-view-title" id="editor-view-title">New Post</h3>
+            <div class="editor-top-actions">
+              <button class="btn-save-draft" id="btn-save-draft">💾 Save Draft</button>
+              <button class="btn-publish-post" id="btn-publish-post">🚀 Publish</button>
+            </div>
+          </div>
+
+          <div id="editor-message" class="editor-message" style="display:none"></div>
+
+          <div class="editor-field">
+            <label class="editor-label">
+              Post Title *
+              <span class="char-count" id="title-char-count">0 / 100</span>
+            </label>
+            <input type="text" id="editor-title" class="editor-input" maxlength="100" placeholder="Write a clear and engaging title..." />
+          </div>
+
+          <div class="editor-field">
+            <label class="editor-label">
+              Short Excerpt *
+              <span class="char-count" id="excerpt-char-count">0 / 200</span>
+            </label>
+            <textarea id="editor-excerpt" class="editor-textarea" maxlength="200" rows="3" placeholder="A short summary shown on the blog listing page..."></textarea>
+          </div>
+
+          <div class="editor-field">
+            <label class="editor-label">Cover Image</label>
+            <div class="cover-image-options">
+              <div class="cover-option">
+                <p class="cover-option-label">Upload from computer</p>
+                <input type="file" id="editor-cover-upload" accept="image/jpeg,image/png,image/webp" class="editor-file-input" />
+                <p class="field-note">Max 2MB · JPG PNG WebP</p>
+              </div>
+              <div class="cover-option-divider">OR</div>
+              <div class="cover-option">
+                <p class="cover-option-label">Paste image URL</p>
+                <input type="text" id="editor-cover-url" class="editor-input" placeholder="https://images.unsplash.com/..." />
+              </div>
+            </div>
+            <div id="cover-preview-wrap" class="cover-preview-wrap" style="display:none">
+              <img id="cover-preview-img" src="" alt="Cover preview" class="cover-preview-img" />
+              <button class="btn-remove-cover" id="btn-remove-cover">✕</button>
+            </div>
+          </div>
+
+          <div class="editor-field">
+            <label class="editor-label">
+              Post Body *
+              <span class="char-count" id="body-char-count">0 / 10,000</span>
+            </label>
+            <div id="quill-editor-wrap">
+              <div id="quill-editor"></div>
+            </div>
+          </div>
+
+          <div class="editor-field">
+            <label class="editor-label">Extra Photos in Post (maximum 3)</label>
+            <p class="field-note" style="margin-bottom:12px;">These appear inside your blog post body after the main content. Max 2MB each.</p>
+            <div class="extra-images-grid">
+              <div class="extra-image-item">
+                <p class="extra-img-label">Photo 1</p>
+                <input type="file" id="extra-img-1-upload" accept="image/jpeg,image/png,image/webp" class="editor-file-input" />
+                <input type="text" id="extra-img-1-url" class="editor-input" placeholder="Or paste URL..." style="margin-top:6px;" />
+                <div id="extra-img-1-preview" class="extra-img-preview" style="display:none"><img src="" alt="" /><button onclick="clearExtraImage(1)">✕</button></div>
+              </div>
+              <div class="extra-image-item">
+                <p class="extra-img-label">Photo 2</p>
+                <input type="file" id="extra-img-2-upload" accept="image/jpeg,image/png,image/webp" class="editor-file-input" />
+                <input type="text" id="extra-img-2-url" class="editor-input" placeholder="Or paste URL..." style="margin-top:6px;" />
+                <div id="extra-img-2-preview" class="extra-img-preview" style="display:none"><img src="" alt="" /><button onclick="clearExtraImage(2)">✕</button></div>
+              </div>
+              <div class="extra-image-item">
+                <p class="extra-img-label">Photo 3</p>
+                <input type="file" id="extra-img-3-upload" accept="image/jpeg,image/png,image/webp" class="editor-file-input" />
+                <input type="text" id="extra-img-3-url" class="editor-input" placeholder="Or paste URL..." style="margin-top:6px;" />
+                <div id="extra-img-3-preview" class="extra-img-preview" style="display:none"><img src="" alt="" /><button onclick="clearExtraImage(3)">✕</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-field">
+            <label class="editor-label">Author</label>
+            <input type="text" id="editor-author" class="editor-input" value="Saujan" style="max-width:300px;" />
+          </div>
+
+          <div class="editor-bottom-actions">
+            <button class="btn-save-draft" id="btn-save-draft-bottom">💾 Save as Draft</button>
+            <button class="btn-publish-post" id="btn-publish-post-bottom">🚀 Publish Post</button>
+            <button class="btn-delete-post" id="btn-delete-post" style="display:none">🗑️ Delete Post</button>
+          </div>
+
+        </div><!-- end blog-editor-view -->
+
+      </div><!-- end panel-blog -->
+
     </main>
   </div>
 
@@ -1363,6 +2142,534 @@
       document.getElementById('dashboard').style.display    = 'block';
       loadInquiries();
     }
+
+    /* ============================================================
+       ADMIN TABS
+       ============================================================ */
+    document.querySelectorAll('.admin-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.admin-panel').forEach(function(p) { p.classList.remove('active'); });
+        this.classList.add('active');
+        var panelId = 'panel-' + this.getAttribute('data-tab');
+        document.getElementById(panelId).classList.add('active');
+      });
+    });
+
+    /* ============================================================
+       GALLERY MANAGEMENT
+       ============================================================ */
+
+    var currentPhotoCount = 0;
+
+    async function loadAdminPhotos() {
+      var grid    = document.getElementById('admin-photo-grid');
+      var countEl = document.getElementById('photo-count-number');
+
+      try {
+        var result = await db.from('photos').select('*').order('display_order', { ascending: true });
+        if (result.error) throw result.error;
+
+        var photos = result.data || [];
+        currentPhotoCount = photos.length;
+        if (countEl) countEl.textContent = currentPhotoCount;
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (photos.length === 0) {
+          grid.innerHTML = '<div class="admin-empty">No photos yet. Upload some above.</div>';
+          return;
+        }
+
+        photos.forEach(function(photo) {
+          var item = document.createElement('div');
+          item.className = 'admin-photo-item';
+          item.innerHTML =
+            '<img src="' + photo.url + '" alt="' + esc(photo.caption || '') + '" loading="lazy" />' +
+            '<div class="admin-photo-actions">' +
+              '<span class="admin-photo-caption-text">' + esc(photo.caption || 'No caption') + '</span>' +
+              '<button class="btn-edit-caption" onclick="editCaption(' + photo.id + ', \'' + (photo.caption || '').replace(/'/g, "\\'") + '\')">✏️ Edit Caption</button>' +
+              '<button class="btn-delete-photo" onclick="deletePhoto(' + photo.id + ', \'' + photo.url + '\')">🗑️ Delete</button>' +
+            '</div>';
+          grid.appendChild(item);
+        });
+
+      } catch (err) {
+        console.error('Load photos error:', err);
+        if (grid) grid.innerHTML = '<div class="admin-empty">Could not load photos.</div>';
+      }
+    }
+
+    async function editCaption(photoId, currentCaption) {
+      var newCaption = prompt('Edit caption:', currentCaption);
+      if (newCaption === null) return;
+      var result = await db.from('photos').update({ caption: newCaption }).eq('id', photoId);
+      if (!result.error) { loadAdminPhotos(); }
+      else { alert('Could not update caption. Please try again.'); }
+    }
+
+    async function deletePhoto(photoId, photoUrl) {
+      if (!confirm('Delete this photo? This cannot be undone.')) return;
+      try {
+        var urlParts = photoUrl.split('/');
+        var fileName = urlParts[urlParts.length - 1];
+        await db.storage.from('gallery-photos').remove([fileName]);
+        var result = await db.from('photos').delete().eq('id', photoId);
+        if (result.error) throw result.error;
+        loadAdminPhotos();
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Could not delete photo. Please try again.');
+      }
+    }
+
+    /* Drag and drop */
+    var uploadZone = document.getElementById('upload-zone');
+    if (uploadZone) {
+      uploadZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadZone.classList.add('drag-active');
+      });
+      uploadZone.addEventListener('dragleave', function() {
+        uploadZone.classList.remove('drag-active');
+      });
+      uploadZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-active');
+        handlePhotoUpload(Array.from(e.dataTransfer.files));
+      });
+      uploadZone.addEventListener('click', function(e) {
+        var t = e.target;
+        if (t === uploadZone || t.classList.contains('upload-zone-icon') ||
+            t.classList.contains('upload-zone-title') || t.classList.contains('upload-zone-sub') ||
+            t.classList.contains('upload-zone-rules')) {
+          document.getElementById('photo-file-input').click();
+        }
+      });
+    }
+
+    var photoFileInput = document.getElementById('photo-file-input');
+    if (photoFileInput) {
+      photoFileInput.addEventListener('change', function() {
+        handlePhotoUpload(Array.from(this.files));
+        this.value = '';
+      });
+    }
+
+    async function handlePhotoUpload(files) {
+      var errorList    = document.getElementById('upload-error-list');
+      var progressWrap = document.getElementById('upload-progress-wrap');
+      var progressFill = document.getElementById('progress-fill');
+      var progressLabel = document.getElementById('progress-label');
+      var successMsg   = document.getElementById('upload-success');
+
+      var MAX_SIZE = 2 * 1024 * 1024;
+      var ALLOWED  = ['image/jpeg', 'image/png', 'image/webp'];
+      var errors   = [];
+      var validFiles = [];
+
+      /* Refresh count */
+      var countResult = await db.from('photos').select('*', { count: 'exact', head: true });
+      currentPhotoCount = countResult.count || 0;
+
+      if (currentPhotoCount >= 25) {
+        errorList.innerHTML = '<div class="upload-error-item">❌ Maximum 25 photos reached. Delete some photos first.</div>';
+        errorList.style.display = 'flex';
+        return;
+      }
+
+      files.forEach(function(file) {
+        if (!ALLOWED.includes(file.type)) {
+          errors.push(file.name + ' — Wrong format. Only JPG, PNG or WebP allowed.');
+        } else if (file.size > MAX_SIZE) {
+          errors.push(file.name + ' — Too large (' + (file.size/1024/1024).toFixed(1) + 'MB). Maximum is 2MB.');
+        } else if (currentPhotoCount + validFiles.length >= 25) {
+          errors.push(file.name + ' — Skipped. Would exceed the 25 photo limit.');
+        } else {
+          validFiles.push(file);
+        }
+      });
+
+      if (errors.length > 0) {
+        errorList.innerHTML = errors.map(function(e) { return '<div class="upload-error-item">❌ ' + e + '</div>'; }).join('');
+        errorList.style.display = 'flex';
+      } else {
+        errorList.style.display = 'none';
+      }
+
+      if (validFiles.length === 0) return;
+
+      successMsg.style.display = 'none';
+      progressWrap.style.display = 'block';
+
+      for (var i = 0; i < validFiles.length; i++) {
+        var file = validFiles[i];
+        var pct  = Math.round((i / validFiles.length) * 100);
+        progressFill.style.width = pct + '%';
+        progressLabel.textContent = 'Uploading ' + (i + 1) + ' of ' + validFiles.length + ': ' + file.name;
+
+        try {
+          var ext      = file.name.split('.').pop().toLowerCase();
+          var fileName = 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2,6) + '.' + ext;
+
+          var uploadResult = await db.storage.from('gallery-photos').upload(fileName, file, { cacheControl: '3600', upsert: false });
+          if (uploadResult.error) {
+            errors.push(file.name + ' — Upload failed: ' + uploadResult.error.message);
+            continue;
+          }
+
+          var urlData = db.storage.from('gallery-photos').getPublicUrl(fileName);
+          var caption = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+
+          await db.from('photos').insert([{ url: urlData.data.publicUrl, caption: caption, display_order: Date.now(), category: 'all' }]);
+
+        } catch (err) {
+          errors.push(file.name + ' — Upload failed unexpectedly.');
+        }
+      }
+
+      progressFill.style.width = '100%';
+      progressLabel.textContent = '✅ Done!';
+
+      setTimeout(function() {
+        progressWrap.style.display = 'none';
+        progressFill.style.width   = '0%';
+        successMsg.style.display   = 'block';
+        setTimeout(function() { successMsg.style.display = 'none'; }, 4000);
+        loadAdminPhotos();
+      }, 1000);
+
+      if (errors.length > 0) {
+        errorList.innerHTML = errors.map(function(e) { return '<div class="upload-error-item">❌ ' + e + '</div>'; }).join('');
+        errorList.style.display = 'flex';
+      }
+    }
+
+    /* ============================================================
+       BLOG MANAGEMENT
+       ============================================================ */
+
+    var currentEditingPostId = null;
+    var quillInstance        = null;
+    var extraImageUrls       = { 1: '', 2: '', 3: '' };
+    var coverImageUrl        = '';
+
+    function initQuill() {
+      if (quillInstance) return;
+      quillInstance = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Write your blog post here...',
+        modules: {
+          toolbar: [
+            [{ header: [2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'blockquote'],
+            ['clean']
+          ]
+        }
+      });
+
+      quillInstance.on('text-change', function() {
+        var charCount = quillInstance.root.innerHTML.replace(/<[^>]*>/g, '').length;
+        var countEl   = document.getElementById('body-char-count');
+        if (countEl) {
+          countEl.textContent = charCount.toLocaleString() + ' / 10,000';
+          countEl.style.color = charCount > 9000 ? '#EF4444' : '#475569';
+        }
+      });
+    }
+
+    function generateSlug(title) {
+      return title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim().substring(0, 80);
+    }
+
+    function showEditorMessage(text, type) {
+      var el = document.getElementById('editor-message');
+      if (!el) return;
+      el.textContent = text;
+      el.className   = 'editor-message ' + type;
+      el.style.display = 'block';
+      setTimeout(function() { el.style.display = 'none'; }, 4000);
+    }
+
+    function showCoverPreview(url) {
+      var wrap = document.getElementById('cover-preview-wrap');
+      var img  = document.getElementById('cover-preview-img');
+      if (url) { img.src = url; wrap.style.display = 'block'; }
+      else      { wrap.style.display = 'none'; }
+    }
+
+    function showExtraImagePreview(num, url) {
+      var preview = document.getElementById('extra-img-' + num + '-preview');
+      var img     = preview.querySelector('img');
+      if (url) { img.src = url; preview.style.display = 'inline-block'; }
+      else      { preview.style.display = 'none'; }
+    }
+
+    function clearExtraImage(num) {
+      extraImageUrls[num] = '';
+      document.getElementById('extra-img-' + num + '-url').value = '';
+      document.getElementById('extra-img-' + num + '-preview').style.display = 'none';
+    }
+
+    async function uploadBlogImage(file) {
+      var MAX_SIZE = 2 * 1024 * 1024;
+      var ALLOWED  = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!ALLOWED.includes(file.type)) { alert('Wrong format. Only JPG, PNG or WebP allowed.'); return null; }
+      if (file.size > MAX_SIZE) { alert('File too large (' + (file.size/1024/1024).toFixed(1) + 'MB). Maximum is 2MB.'); return null; }
+
+      var ext      = file.name.split('.').pop().toLowerCase();
+      var fileName = 'blog-' + Date.now() + '-' + Math.random().toString(36).substr(2,6) + '.' + ext;
+
+      var result = await db.storage.from('blog-images').upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (result.error) { alert('Upload failed: ' + result.error.message); return null; }
+
+      var urlData = db.storage.from('blog-images').getPublicUrl(fileName);
+      return urlData.data.publicUrl;
+    }
+
+    function switchToBlogEditor(post) {
+      document.getElementById('blog-list-view').style.display   = 'none';
+      document.getElementById('blog-editor-view').style.display = 'block';
+      initQuill();
+
+      currentEditingPostId = null;
+      coverImageUrl        = '';
+      extraImageUrls       = { 1: '', 2: '', 3: '' };
+
+      document.getElementById('editor-title').value   = '';
+      document.getElementById('editor-excerpt').value = '';
+      document.getElementById('editor-cover-url').value = '';
+      document.getElementById('editor-author').value  = 'Saujan';
+      document.getElementById('cover-preview-wrap').style.display  = 'none';
+      document.getElementById('editor-view-title').textContent      = 'New Post';
+      document.getElementById('btn-delete-post').style.display      = 'none';
+      document.getElementById('title-char-count').textContent       = '0 / 100';
+      document.getElementById('excerpt-char-count').textContent     = '0 / 200';
+      document.getElementById('body-char-count').textContent        = '0 / 10,000';
+      [1,2,3].forEach(function(n) {
+        document.getElementById('extra-img-' + n + '-url').value     = '';
+        document.getElementById('extra-img-' + n + '-preview').style.display = 'none';
+      });
+      quillInstance.root.innerHTML = '';
+
+      if (post) {
+        currentEditingPostId = post.id;
+        document.getElementById('editor-title').value   = post.title   || '';
+        document.getElementById('editor-excerpt').value = post.excerpt  || '';
+        document.getElementById('editor-author').value  = post.author   || 'Saujan';
+        document.getElementById('editor-view-title').textContent  = 'Edit Post';
+        document.getElementById('btn-delete-post').style.display  = 'block';
+        document.getElementById('title-char-count').textContent   = (post.title || '').length + ' / 100';
+        document.getElementById('excerpt-char-count').textContent = (post.excerpt || '').length + ' / 200';
+        quillInstance.root.innerHTML = post.body || '';
+
+        if (post.cover_image) {
+          coverImageUrl = post.cover_image;
+          document.getElementById('editor-cover-url').value = post.cover_image;
+          showCoverPreview(post.cover_image);
+        }
+        [1,2,3].forEach(function(n) {
+          var url = post['image_' + n];
+          if (url) {
+            extraImageUrls[n] = url;
+            document.getElementById('extra-img-' + n + '-url').value = url;
+            showExtraImagePreview(n, url);
+          }
+        });
+      }
+    }
+
+    function switchToBlogList() {
+      document.getElementById('blog-editor-view').style.display = 'none';
+      document.getElementById('blog-list-view').style.display   = 'block';
+      loadBlogPosts();
+    }
+
+    async function savePost(publish) {
+      var title   = document.getElementById('editor-title').value.trim();
+      var excerpt = document.getElementById('editor-excerpt').value.trim();
+      var body    = quillInstance ? quillInstance.root.innerHTML : '';
+      var author  = document.getElementById('editor-author').value.trim() || 'Saujan';
+
+      if (!title)   { showEditorMessage('❌ Please add a title.', 'error'); return; }
+      if (!excerpt) { showEditorMessage('❌ Please add an excerpt.', 'error'); return; }
+      if (!body || body === '<p><br></p>') { showEditorMessage('❌ Please write some content.', 'error'); return; }
+
+      var bodyText = body.replace(/<[^>]*>/g, '');
+      if (bodyText.length > 10000) { showEditorMessage('❌ Post body is too long. Maximum 10,000 characters.', 'error'); return; }
+
+      var postData = {
+        title:       title,
+        slug:        generateSlug(title),
+        excerpt:     excerpt,
+        body:        body,
+        cover_image: coverImageUrl || null,
+        image_1:     extraImageUrls[1] || null,
+        image_2:     extraImageUrls[2] || null,
+        image_3:     extraImageUrls[3] || null,
+        author:      author,
+        published:   publish
+      };
+
+      try {
+        var result;
+        if (currentEditingPostId) {
+          result = await db.from('blog_posts').update(postData).eq('id', currentEditingPostId);
+        } else {
+          result = await db.from('blog_posts').insert([postData]);
+        }
+        if (result.error) throw result.error;
+
+        var msg = publish ? '✅ Post published! It is now live on your website.' : '✅ Draft saved successfully.';
+        showEditorMessage(msg, 'success');
+        setTimeout(switchToBlogList, 2000);
+
+      } catch (err) {
+        console.error('Save post error:', err);
+        showEditorMessage('❌ Could not save post. Please try again.', 'error');
+      }
+    }
+
+    async function deletePost() {
+      if (!currentEditingPostId) return;
+      if (!confirm('Delete this post permanently? This cannot be undone.')) return;
+      var result = await db.from('blog_posts').delete().eq('id', currentEditingPostId);
+      if (result.error) { showEditorMessage('❌ Could not delete post.', 'error'); }
+      else { switchToBlogList(); }
+    }
+
+    async function togglePublish(postId, currentStatus) {
+      var result = await db.from('blog_posts').update({ published: !currentStatus }).eq('id', postId);
+      if (!result.error) loadBlogPosts();
+    }
+
+    async function loadBlogPosts() {
+      var container = document.getElementById('blog-post-list');
+      if (!container) return;
+      container.innerHTML = '<div style="color:#64748B;padding:20px;text-align:center;font-size:14px;">Loading posts...</div>';
+
+      try {
+        var result = await db.from('blog_posts').select('*').order('created_at', { ascending: false });
+        if (result.error) throw result.error;
+
+        var posts = result.data || [];
+        if (posts.length === 0) {
+          container.innerHTML = '<div style="color:#64748B;padding:40px;text-align:center;font-size:14px;">No posts yet. Click New Post to get started.</div>';
+          return;
+        }
+
+        container.innerHTML = '';
+        posts.forEach(function(post) {
+          var date = new Date(post.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+          var row  = document.createElement('div');
+          row.className = 'blog-post-row';
+          row.innerHTML =
+            '<div class="blog-row-info">' +
+              '<div class="blog-row-title">' + esc(post.title) + '</div>' +
+              '<div class="blog-row-meta">' +
+                '<span>' + date + '</span>' +
+                '<span class="status-badge ' + (post.published ? 'status-published' : 'status-draft') + '">' + (post.published ? 'Published' : 'Draft') + '</span>' +
+                '<span>by ' + esc(post.author || 'Saujan') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="blog-row-actions">' +
+              '<button class="btn-toggle-publish" onclick="togglePublish(' + post.id + ', ' + post.published + ')">' + (post.published ? 'Unpublish' : 'Publish') + '</button>' +
+              '<button class="btn-edit-post" onclick="editPost(' + post.id + ')">Edit</button>' +
+            '</div>';
+          container.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error('Load posts error:', err);
+        container.innerHTML = '<div style="color:#64748B;padding:20px;text-align:center;">Could not load posts.</div>';
+      }
+    }
+
+    async function editPost(postId) {
+      var result = await db.from('blog_posts').select('*').eq('id', postId).limit(1);
+      if (result.data && result.data.length > 0) switchToBlogEditor(result.data[0]);
+    }
+
+    /* ─── BLOG EVENT LISTENERS ───────────────────────────────────── */
+
+    var btnNewPost = document.getElementById('btn-new-post');
+    if (btnNewPost) btnNewPost.addEventListener('click', function() { switchToBlogEditor(null); });
+
+    var btnBackList = document.getElementById('btn-back-list');
+    if (btnBackList) btnBackList.addEventListener('click', switchToBlogList);
+
+    var btnSaveDraft = document.getElementById('btn-save-draft');
+    if (btnSaveDraft) btnSaveDraft.addEventListener('click', function() { savePost(false); });
+
+    var btnPublishPost = document.getElementById('btn-publish-post');
+    if (btnPublishPost) btnPublishPost.addEventListener('click', function() { savePost(true); });
+
+    var btnSaveDraftBottom = document.getElementById('btn-save-draft-bottom');
+    if (btnSaveDraftBottom) btnSaveDraftBottom.addEventListener('click', function() { savePost(false); });
+
+    var btnPublishPostBottom = document.getElementById('btn-publish-post-bottom');
+    if (btnPublishPostBottom) btnPublishPostBottom.addEventListener('click', function() { savePost(true); });
+
+    var btnDeletePost = document.getElementById('btn-delete-post');
+    if (btnDeletePost) btnDeletePost.addEventListener('click', deletePost);
+
+    var editorTitle = document.getElementById('editor-title');
+    if (editorTitle) editorTitle.addEventListener('input', function() {
+      document.getElementById('title-char-count').textContent = this.value.length + ' / 100';
+    });
+
+    var editorExcerpt = document.getElementById('editor-excerpt');
+    if (editorExcerpt) editorExcerpt.addEventListener('input', function() {
+      document.getElementById('excerpt-char-count').textContent = this.value.length + ' / 200';
+    });
+
+    var editorCoverUrl = document.getElementById('editor-cover-url');
+    if (editorCoverUrl) editorCoverUrl.addEventListener('input', function() {
+      coverImageUrl = this.value.trim();
+      showCoverPreview(coverImageUrl);
+    });
+
+    var editorCoverUpload = document.getElementById('editor-cover-upload');
+    if (editorCoverUpload) editorCoverUpload.addEventListener('change', async function() {
+      if (!this.files[0]) return;
+      var url = await uploadBlogImage(this.files[0]);
+      if (url) { coverImageUrl = url; document.getElementById('editor-cover-url').value = url; showCoverPreview(url); }
+      this.value = '';
+    });
+
+    var btnRemoveCover = document.getElementById('btn-remove-cover');
+    if (btnRemoveCover) btnRemoveCover.addEventListener('click', function() {
+      coverImageUrl = '';
+      document.getElementById('editor-cover-url').value = '';
+      showCoverPreview('');
+    });
+
+    [1,2,3].forEach(function(n) {
+      var urlInput = document.getElementById('extra-img-' + n + '-url');
+      if (urlInput) urlInput.addEventListener('input', function() {
+        extraImageUrls[n] = this.value.trim();
+        showExtraImagePreview(n, extraImageUrls[n]);
+      });
+
+      var fileInput = document.getElementById('extra-img-' + n + '-upload');
+      if (fileInput) fileInput.addEventListener('change', async function() {
+        if (!this.files[0]) return;
+        var url = await uploadBlogImage(this.files[0]);
+        if (url) {
+          extraImageUrls[n] = url;
+          document.getElementById('extra-img-' + n + '-url').value = url;
+          showExtraImagePreview(n, url);
+        }
+        this.value = '';
+      });
+    });
+
+    /* ─── TAB CLICK → LOAD DATA ──────────────────────────────────── */
+    document.querySelector('[data-tab="gallery"]').addEventListener('click', function() { loadAdminPhotos(); });
+    document.querySelector('[data-tab="blog"]').addEventListener('click',    function() { loadBlogPosts();   });
+
   </script>
 </body>
 </html>
